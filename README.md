@@ -1,2 +1,2 @@
-# ErrorEagle-Jar
-Repositório do projeto jar
+# ErrorEagle - Java
+Repositório dos mini projetos em java
