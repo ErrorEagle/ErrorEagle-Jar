@@ -4,7 +4,6 @@
  */
 package application;
 
-
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -14,28 +13,28 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class Conexao {
 
-    private JdbcTemplate connection;
+  private JdbcTemplate connection;
 
-    public Conexao() {
+  public Conexao() {
 
-        BasicDataSource dataSource = new BasicDataSource();
+    BasicDataSource dataSource = new BasicDataSource();
 
-        dataSource​.setDriverClassName("com.mysql.cj.jdbc.Driver");
+    dataSource​.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
-        dataSource​.setUrl("jdbc:mysql://localhost:3306/erroreagle");
+    dataSource​.setUrl("jdbc:mysql://localhost:3306/ErrorEagle");
 
-        dataSource​.setUsername("Lucas Barroso");
+    dataSource​.setUsername("root");
 
-        dataSource​.setPassword("Lukinhas123");
+    dataSource​.setPassword("Jh%k@S$%5KS");
 
-        this.connection = new JdbcTemplate(dataSource);
+    this.connection = new JdbcTemplate(dataSource);
 
-    }
+  }
 
-    public JdbcTemplate getConnection() {
+  public JdbcTemplate getConnection() {
 
-        return connection;
+    return connection;
 
-    }
+  }
 
 }

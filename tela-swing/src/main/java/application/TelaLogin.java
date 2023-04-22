@@ -13,40 +13,40 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 public class TelaLogin extends javax.swing.JFrame {
 
-    /**
-     * Creates new form JFrame
-     */
-    public TelaLogin() {
-        initComponents();
-        setPlaceholder(iptUsuario, "Ex: admin");
-        setPlaceholder(iptSenha, "***********");
+  /**
+   * Creates new form JFrame
+   */
+  public TelaLogin() {
+    initComponents();
+    setPlaceholder(iptUsuario, "Ex: admin");
+    setPlaceholder(iptSenha, "***********");
 
-    }
+  }
 
-    private void setPlaceholder(JTextField field, String placeholder) {
-        field.setForeground(Color.GRAY);
-        field.setText(placeholder);
+  private void setPlaceholder(JTextField field, String placeholder) {
+    field.setForeground(Color.GRAY);
+    field.setText(placeholder);
 
-        field.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (field.getText().equals(placeholder)) {
-                    field.setText("");
-                    field.setForeground(Color.BLACK);
-                }
-            }
+    field.addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        if (field.getText().equals(placeholder)) {
+          field.setText("");
+          field.setForeground(Color.BLACK);
+        }
+      }
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (field.getText().isEmpty()) {
-                    field.setForeground(Color.GRAY);
-                    field.setText(placeholder);
-                }
-            }
-        });
-    }
+      @Override
+      public void focusLost(FocusEvent e) {
+        if (field.getText().isEmpty()) {
+          field.setForeground(Color.GRAY);
+          field.setText(placeholder);
+        }
+      }
+    });
+  }
 
-    @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -145,7 +145,7 @@ public class TelaLogin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void iptSenhaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_iptSenhaActionPerformed
-        // TODO add your handling code here:
+    // TODO add your handling code here:
     }//GEN-LAST:event_iptSenhaActionPerformed
 
     private void iptUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_iptUsuarioActionPerformed
@@ -157,65 +157,77 @@ public class TelaLogin extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void btnLoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoginMouseClicked
-        Conexao conexao = new Conexao();
-        Screen2 sc = new Screen2();
+    Conexao conexao = new Conexao();
+    Screen2 sc = new Screen2();
 
-        JdbcTemplate con = conexao.getConnection();
+    JdbcTemplate con = conexao.getConnection();
+    String inpSenha = iptSenha.getText();
+    String inpEmail = iptUsuario.getText();
+    System.out.println(inpEmail);
+    System.out.println(inpSenha);
+    List<Login> listaUsuarios = new ArrayList();
+    listaUsuarios
+            = con.query("select email, senha from Funcionario where email = ? and senha = ?", new BeanPropertyRowMapper(Login.class
+            ), inpEmail, inpSenha);
 
-        List<Login> listaUsuarios = new ArrayList();
-        listaUsuarios = con.query("select email, senha from testeLoginMaquinas where email = ? and senha = ?", new BeanPropertyRowMapper(Login.class), iptUsuario, iptSenha);
+    System.out.println(listaUsuarios);
 
-        System.out.println(listaUsuarios);
+    if (listaUsuarios.isEmpty()) {
+      JOptionPane.showMessageDialog(null, "Usuário ou senha Inválidos");
+      iptSenha.setText("");
+      iptUsuario.setText("");
 
-        if (listaUsuarios.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Usuário ou senha Inválidos");
-            iptSenha.setText("");
-            iptUsuario.setText("");
-            
+    } else {
+      sc.setVisible(true);
+      dispose();
 
-        } else {
-            sc.setVisible(true);
-            dispose();
-
-        }
+    }
 
     }//GEN-LAST:event_btnLoginMouseClicked
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+  /**
+   * @param args the command line arguments
+   */
+  public static void main(String args[]) {
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
+     */
+    try {
+      for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+        if ("Nimbus".equals(info.getName())) {
+          javax.swing.UIManager.setLookAndFeel(info.getClassName());
+          break;
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new TelaLogin().setVisible(true);
-            }
-        });
+        }
+      }
+    } catch (ClassNotFoundException ex) {
+      java.util.logging.Logger.getLogger(TelaLogin.class
+              .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
+    } catch (InstantiationException ex) {
+      java.util.logging.Logger.getLogger(TelaLogin.class
+              .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
+    } catch (IllegalAccessException ex) {
+      java.util.logging.Logger.getLogger(TelaLogin.class
+              .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
+    } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+      java.util.logging.Logger.getLogger(TelaLogin.class
+              .getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
+    //</editor-fold>
+    //</editor-fold>
+
+    /* Create and display the form */
+    java.awt.EventQueue.invokeLater(new Runnable() {
+      public void run() {
+        new TelaLogin().setVisible(true);
+      }
+    });
+  }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogin;
