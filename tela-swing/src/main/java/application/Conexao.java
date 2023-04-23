@@ -4,6 +4,8 @@
  */
 package application;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -18,16 +20,16 @@ public class Conexao {
   public Conexao() {
 
     BasicDataSource dataSource = new BasicDataSource();
-
+    
     // Procurar na internet o c driver da Azure
-    dataSource​.setDriverClassName("com.mysql.cj.jdbc.Driver");
+    dataSource​.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
     //Colocar o caminho até o banco de dados da Azure
-    dataSource​.setUrl("jdbc:mysql://localhost:3306/ErrorEagle");
+    dataSource​.setUrl("jdbc:sqlserver://svr-erroreagle.database.windows.net:1433;database=bd-errorEagle;user=admin-erroreagle@svr-erroreagle;password={#Gfgrupo3};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;");
 
-    dataSource​.setUsername("Lucas Barroso");
-
-    dataSource​.setPassword("Lukinhas123");
+//    dataSource​.setUsername("admin-erroreagle");
+//
+//    dataSource​.setPassword("#Gfgrupo3");
 
     this.connection = new JdbcTemplate(dataSource);
 
