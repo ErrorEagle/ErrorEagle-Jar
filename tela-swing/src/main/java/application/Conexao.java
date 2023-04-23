@@ -19,13 +19,15 @@ public class Conexao {
 
     BasicDataSource dataSource = new BasicDataSource();
 
+    // Procurar na internet o c driver da Azure
     dataSource​.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
+    //Colocar o caminho até o banco de dados da Azure
     dataSource​.setUrl("jdbc:mysql://localhost:3306/ErrorEagle");
 
-    dataSource​.setUsername("root");
+    dataSource​.setUsername("Lucas Barroso");
 
-    dataSource​.setPassword("Jh%k@S$%5KS");
+    dataSource​.setPassword("Lukinhas123");
 
     this.connection = new JdbcTemplate(dataSource);
 

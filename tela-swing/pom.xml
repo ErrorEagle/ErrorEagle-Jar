@@ -53,6 +53,9 @@
             <version>2.5.0</version>
         </dependency>
         
+        
+    <!-- Substituir a dependencia do mySQL pelo da Azure -->
+    
         <!-- Dependencia MySQL -->
         <dependency>
             <groupId>com.mysql</groupId>

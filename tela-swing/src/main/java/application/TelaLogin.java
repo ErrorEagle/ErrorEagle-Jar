@@ -166,8 +166,9 @@ public class TelaLogin extends javax.swing.JFrame {
     System.out.println(inpEmail);
     System.out.println(inpSenha);
     List<Login> listaUsuarios = new ArrayList();
-    listaUsuarios
-            = con.query("select email, senha from Funcionario where email = ? and senha = ?", new BeanPropertyRowMapper(Login.class
+    
+    // Verificar se o comando select muda de acordo com as tabelas na Azure
+    listaUsuarios = con.query("select email, senha from Funcionario where email = ? and senha = ?", new BeanPropertyRowMapper(Login.class
             ), inpEmail, inpSenha);
 
     System.out.println(listaUsuarios);
