@@ -27,12 +27,12 @@ public class Conexao {
     //Colocar o caminho até o banco de dados da Azure
     dataSource​.setUrl("jdbc:sqlserver://svr-erroreagle.database.windows.net:1433;database=bd-errorEagle;user=admin-erroreagle@svr-erroreagle;password={#Gfgrupo3};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;");
 
-//    dataSource​.setUsername("admin-erroreagle");
-//
-//    dataSource​.setPassword("#Gfgrupo3");
+    dataSource​.setUsername("admin-erroreagle");
+
+    dataSource​.setPassword("#Gfgrupo3");
 
     this.connection = new JdbcTemplate(dataSource);
-
+    
   }
 
   public JdbcTemplate getConnection() {
