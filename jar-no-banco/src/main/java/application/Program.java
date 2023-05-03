@@ -4,14 +4,11 @@ import java.util.Scanner;
 
 public class Program {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+        Conexao conexao = new Conexao();
+
+        JdbcTemplate con = conexao.getConexaoDoBanco();
         
-        
-        
-        
-        
-        
-        
-        sc.close();
+        con.execute("drop table if exists filme;");
     }
+    
 }
