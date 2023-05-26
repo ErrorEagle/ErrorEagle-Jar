@@ -22,9 +22,10 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>application.TelaLogin</mainClass> 
+                            <mainClass>frames.TelaLogin</mainClass> 
                         </manifest>
                     </archive>
+                  <finalName>ErrorEagle</finalName> 
                 </configuration>
                 <executions>
                     <execution>
@@ -78,7 +79,14 @@
             <artifactId>AbsoluteLayout</artifactId>
             <version>RELEASE126</version>
         </dependency>
-    </dependencies>
+   
     
+        <!-- Dependencia Looca -->
+        <dependency>
+            <groupId>com.github.britooo</groupId>
+            <artifactId>looca-api</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+    </dependencies>
     <name>tela-swing</name>
 </project>
