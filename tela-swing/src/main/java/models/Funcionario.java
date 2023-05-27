@@ -10,10 +10,18 @@ package models;
  */
 public class Funcionario {
 
-    private String email, senha;
+    private String nome, email, senha;
     private Integer fkEmpresa, firstAcess, statusFuncionario;
     
     public Funcionario() {
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public Integer getFirstAcess() {

@@ -60,11 +60,6 @@ public class VerificarTotem extends javax.swing.JFrame {
                 lm.validarLimites();
                 
                 jLabel1.setText("Capturando Dados!");
-                try {
-                    this.wait(5000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(VerificarTotem.class.getName()).log(Level.SEVERE, null, ex);
-                }
                 iniciarCaptura();
                 
             }

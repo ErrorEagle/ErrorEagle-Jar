@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-
 import conexoes.ConexaoAzure;
 import models.Empresa;
 import models.Funcionario;
@@ -26,7 +25,9 @@ import com.github.britooo.looca.api.group.rede.RedeInterface;
 import com.github.britooo.looca.api.group.rede.RedeInterfaceGroup;
 import java.awt.Shape;
 import java.awt.geom.RoundRectangle2D;
+import static javax.swing.UIManager.getString;
 import models.Configuracao;
+import models.Log;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -40,11 +41,10 @@ public class Login extends javax.swing.JFrame {
 
         setPlaceholder(iptUsuario, "Ex: admin");
         setPlaceholder(iptSenha, "***********");
-        
+
         Shape roundedShape = new RoundRectangle2D.Double(0, 0, this.getWidth(), this.getHeight(), 20, 20);
         this.setShape(roundedShape);
-     
-       
+
     }
 
     private void setPlaceholder(JTextField field, String placeholder) {
@@ -198,16 +198,17 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void btnLoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoginMouseClicked
+        Log log = new Log();
+
         ConexaoAzure conexaoA = new ConexaoAzure();
         JdbcTemplate conA = conexaoA.getConnection();
 
         String inpSenha = iptSenha.getText();
         String inpEmail = iptUsuario.getText();
 
-
         listaUsuarios = new ArrayList();
 
-        listaUsuarios = conA.query("select email, senha, firstAcess, statusFuncionario, fkEmpresa from Funcionario where email = ?",
+        listaUsuarios = conA.query("select nome, email, senha, firstAcess, statusFuncionario, fkEmpresa from Funcionario where email = ?",
                 new BeanPropertyRowMapper(Funcionario.class), inpEmail);
 
         if (listaUsuarios.isEmpty()) {
@@ -216,16 +217,20 @@ public class Login extends javax.swing.JFrame {
             iptUsuario.setText("");
 
         } else {
-
+            
+            log.writeLogEntry( log.buildLogEntry(listaUsuarios.get(0).getNome()), log.readLogFile() );
+            
             Funcionario usuario = listaUsuarios.get(0);
 
             listaEmpresa = conA.query("select statusEmpresa, bandaLarga from Empresa where id = ?", new BeanPropertyRowMapper(Empresa.class), usuario.getFkEmpresa());
-
+            log.writeRecordToLogFile("Me conectei com a Azure para pegar informações da Empresa");
+            
             Empresa empresa = listaEmpresa.get(0);
 
             if (empresa.getStatusEmpresa() == 0) {
 
                 JOptionPane.showMessageDialog(null, "Verifique a validade do contrato com a errorEagle");
+                log.writeRecordToLogFile("Status da empresa desativados, ou seja, contrato interrompido");
 
             } else if (usuario.getStatusFuncionario() == 0) {
 
@@ -236,7 +241,7 @@ public class Login extends javax.swing.JFrame {
                 sc.setVisible(true);
                 dispose();
 
-            } else if (!usuario.getSenha().equals(inpSenha) || inpSenha.length() == 0 || inpEmail.length() == 0 ) {
+            } else if (!usuario.getSenha().equals(inpSenha) || inpSenha.length() == 0 || inpEmail.length() == 0) {
                 JOptionPane.showMessageDialog(null, "Email ou Senha inválidos!");
                 iptSenha.setText("");
                 iptUsuario.setText("");
@@ -299,8 +304,6 @@ public class Login extends javax.swing.JFrame {
             }
         });
     }
-
-    
 
     public List<Funcionario> getListaUsuarios() {
         return listaUsuarios;
