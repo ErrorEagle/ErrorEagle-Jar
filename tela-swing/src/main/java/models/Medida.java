@@ -23,6 +23,8 @@ public class Medida {
     Looca looca = new Looca();
     private Double usoCPU = 0.0, usoRAM = 0.0, usoDisco = 0.0, usoRede = 0.0;
     private List<Medida> listaMedidas;
+    
+    Log log = new Log();
 
     public Medida() {
     }
@@ -73,24 +75,27 @@ public class Medida {
         Double usoRede = Double.parseDouble(frequenciaFormatada);
 
         Double percentualRede = usoRede * 100 / capacidade;
-
+        log.writeRecordToLogFile("Inserindos Medida da CPU");
         conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,1)",
                 usoCPU,
                 dataHora,
                 id
         );
+        log.writeRecordToLogFile("Inserindos Medida da RAM");
         conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,2)",
                 porcentagemUsoRam,
                 dataHora,
                 id
         );
 
+        log.writeRecordToLogFile("Inserindos Medida do DISCO");
         conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,3)",
                 porcentagemDisponivel,
                 dataHora,
                 id
         );
 
+        log.writeRecordToLogFile("Inserindos Medida da REDE");
         conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,4)",
                 percentualRede,
                 dataHora,

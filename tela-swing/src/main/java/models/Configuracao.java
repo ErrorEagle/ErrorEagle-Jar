@@ -22,6 +22,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class Configuracao {
 
     Looca looca = new Looca();
+    Log log = new Log();
+
     private List<Configuracao> listaConfiguracao;
     private Double capacidade;
     private String unidadeMedida;
@@ -61,7 +63,7 @@ public class Configuracao {
     }
 
     public void validarConfiguracao(Integer idTotem, Double bandaLarga) {
-
+        log.writeRecordToLogFile("Validando Configuração...");
         listaConfiguracao = new ArrayList();
 
         Configuracao config = new Configuracao();
@@ -75,7 +77,7 @@ public class Configuracao {
         listaConfiguracao = conA.query("select * from Configuracao where fkTotem = ?", new BeanPropertyRowMapper(Configuracao.class), idTotem);
 
         if (listaConfiguracao.isEmpty()) {
-
+            log.writeRecordToLogFile("Associando Configuração a este Totem...");
             //Cadastrar CPU
             conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 1, ?, 'GHz')", idTotem, bandaLarga);
 
@@ -103,9 +105,9 @@ public class Configuracao {
             conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 4, ?, 'Mbps')", idTotem, bandaLarga);
 
             validarConfiguracao(idTotem, bandaLarga);
-            
-        } else {
 
+        } else {
+            log.writeRecordToLogFile("Verificando se a Configuração foi salva corretamente...");
             Boolean hasRAM = true, hasCPU = true, hasDisco = true, hasRede = true;
             Boolean updateRAM = true, updateCPU = false, updateDisco = true, updateRede = true;
 
@@ -142,9 +144,11 @@ public class Configuracao {
             }
 
             if (hasCPU) {
+                log.writeRecordToLogFile("Cadastrando Configuracao CPU");
                 conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 1, ?, 'GHz')", idTotem, config.getCapacidadeCPU());
             }
             if (hasRAM) {
+                log.writeRecordToLogFile("Cadastrando Configuracao RAM");
                 conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 2, ?, 'GB')", idTotem, config.getCapacidadeRAM());
             }
             if (hasDisco) {
@@ -158,21 +162,25 @@ public class Configuracao {
                     Double tamanhoTB = Math.floor(tamanhoGB / Math.pow(2, 10));
 
                     if (tamanhoTB >= 1.0) {
+                        log.writeRecordToLogFile("Cadastrando Configuracao DISCO com medida em TB");
                         conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'TB')", idTotem, tamanhoTB);
                     } else {
+                        log.writeRecordToLogFile("Cadastrando Configuracao DISCO com medida em GB");
                         conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'GB')", idTotem, tamanhoGB);
                     }
                 }
             }
             if (hasRede) {
-                conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 4, ?, 'Mbps')", idTotem,bandaLarga);
+                log.writeRecordToLogFile("Cadastrando Configuracao REDE");
+                conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 4, ?, 'Mbps')", idTotem, bandaLarga);
             }
 
             if (updateCPU) {
+                log.writeRecordToLogFile("Atualizando Configuração da CPU");
                 conA.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 1", config.getCapacidadeCPU(), idTotem);
-
             }
             if (updateRAM) {
+                log.writeRecordToLogFile("Atualizando Configuração da RAM");
                 conA.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 2", config.getCapacidadeRAM(), idTotem);
             }
             if (updateDisco) {
@@ -186,18 +194,21 @@ public class Configuracao {
                     Double tamanhoTB = Math.floor(tamanhoGB / Math.pow(2, 10));
 
                     if (tamanhoTB >= 1.0) {
+                        log.writeRecordToLogFile("Atualizando Configuração do DISCO em TB");
                         conA.update("update Configuracao set capacidade = ?, unidadeMedida = 'TB' where fkComponente = 3 and fkTotem = ? ", tamanhoTB, idTotem);
                     } else {
+                        log.writeRecordToLogFile("Atualizando Configuração da DISCO em GB");
                         conA.update("update Configuracao set capacidade = ?, unidadeMedida = 'GB' where fkComponente = 3 and fkTotem = ? ", tamanhoGB, idTotem);
                     }
                 }
             }
             if (updateRede) {
-                conA.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 4",bandaLarga, idTotem);
+                log.writeRecordToLogFile("Atualizando Configuração da REDE");
+                conA.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 4", bandaLarga, idTotem);
             }
 
         }
-
+        log.writeRecordToLogFile("Cadastro da Configuração concluída!");
         conexaoA.closeConnection();
 
     }

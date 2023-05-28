@@ -21,6 +21,7 @@ import models.Configuracao;
 import models.Empresa;
 import models.Funcionario;
 import models.Limite;
+import models.Log;
 import models.Medida;
 import models.TipoAlerta;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -29,6 +30,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class VerificarTotem extends javax.swing.JFrame {
 
     Looca looca = new Looca();
+    Log log = new Log();
     private List<Totem> listaTotem;
 
     private Integer fkEmpresa;
@@ -58,10 +60,10 @@ public class VerificarTotem extends javax.swing.JFrame {
                 tp.validarTiposAlertas();
                 pbTeste.setValue(99);
                 lm.validarLimites();
-                
+
                 jLabel1.setText("Capturando Dados!");
                 iniciarCaptura();
-                
+
             }
         });
     }
@@ -70,7 +72,7 @@ public class VerificarTotem extends javax.swing.JFrame {
 
         ConexaoAzure conexaoA = new ConexaoAzure();
         JdbcTemplate conA = conexaoA.getConnection();
-
+        log.writeRecordToLogFile("Validando se a máquina já está cadastrada...");
         String hostNameAtual = looca.getRede().getParametros().getHostName();
 
         listaTotem = new ArrayList();
@@ -80,16 +82,19 @@ public class VerificarTotem extends javax.swing.JFrame {
 
         if (listaTotem.isEmpty()) {
 
+            log.writeRecordToLogFile("Máquina não cadastrada! Executando cadastro azure...");
             conA.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
 
             listaTotem = new ArrayList();
 
             listaTotem = conA.query("select * from Totem where hostName = ?",
                     new BeanPropertyRowMapper(Totem.class), hostNameAtual);
+            log.writeRecordToLogFile("Máquina cadastrada!");
 
         } else {
             if (!listaTotem.get(0).getFkEmpresa().equals(fkEmpresa)) {
                 JOptionPane.showMessageDialog(null, "Essa máquina já está cadastrata em outra empresa!");
+                log.writeRecordToLogFile("Máquina cadastrada em outra empresa!");
                 System.exit(0);
             }
         }
@@ -97,30 +102,31 @@ public class VerificarTotem extends javax.swing.JFrame {
         conexaoA.closeConnection();
 
 //   -------------------------------------- LOCAL -----------------------------------------
-        
-//        ConexaoLocal conexaoL = new ConexaoLocal();
-//        JdbcTemplate conL = conexaoL.getConnection();
-//        
-//        listaTotem = new ArrayList();
-//
-//        listaTotem = conA.query("select * from Totem where hostName = ?",
-//                new BeanPropertyRowMapper(Totem.class), hostNameAtual);
-//
-//        if (listaTotem.isEmpty()) {
-//
-//            conL.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
-//
-//            listaTotem = conL.query("select * from Totem where hostName = ?",
-//                    new BeanPropertyRowMapper(Totem.class), hostNameAtual);
-//
-//        } else {
-//            if (!listaTotem.get(0).getFkEmpresa().equals(fkEmpresa)) {
-//                JOptionPane.showMessageDialog(null, "Essa máquina já está cadastrata em outra empresa!");
-//                System.exit(0);
-//            }
-//        }
-//
-//        conexaoL.closeConnection();
+        ConexaoLocal conexaoL = new ConexaoLocal();
+        JdbcTemplate conL = conexaoL.getConnection();
+        log.writeRecordToLogFile("Validando se a máquina já está cadastrada no Local...");
+        listaTotem = new ArrayList();
+
+        listaTotem = conA.query("select * from Totem where hostName = ?",
+                new BeanPropertyRowMapper(Totem.class), hostNameAtual);
+
+        if (listaTotem.isEmpty()) {
+            
+            log.writeRecordToLogFile("Máquina não cadastrada localmente! Executando cadastro local...");
+            conL.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
+            
+            listaTotem = conL.query("select * from Totem where hostName = ?",
+                    new BeanPropertyRowMapper(Totem.class), hostNameAtual);
+
+        } else {
+            if (!listaTotem.get(0).getFkEmpresa().equals(fkEmpresa)) {
+                JOptionPane.showMessageDialog(null, "Essa máquina já está cadastrata em outra empresa!");
+                log.writeRecordToLogFile("Máquina cadastrada em outra empresa!");
+                System.exit(0);
+            }
+        }
+
+        conexaoL.closeConnection();
     }
 
     public void iniciarCaptura() {
@@ -128,6 +134,7 @@ public class VerificarTotem extends javax.swing.JFrame {
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+                log.writeRecordToLogFile("Capturando dados...");
                 medida.inserirMedidas(listaTotem.get(0).getId(), bandaLarga);
                 // Restante do código...
             }

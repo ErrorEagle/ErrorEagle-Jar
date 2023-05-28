@@ -218,7 +218,7 @@ public class Login extends javax.swing.JFrame {
 
         } else {
             
-            log.writeLogEntry( log.buildLogEntry(listaUsuarios.get(0).getNome()), log.readLogFile() );
+            log.writeLogEntry(log.buildLogEntry(listaUsuarios.get(0).getNome()), log.readLogFile() );
             
             Funcionario usuario = listaUsuarios.get(0);
 
@@ -235,19 +235,23 @@ public class Login extends javax.swing.JFrame {
             } else if (usuario.getStatusFuncionario() == 0) {
 
                 JOptionPane.showMessageDialog(null, "Você está inativado, verifique o acesso com seu supervisor ou algum responsável na empresa!");
-
+                log.writeRecordToLogFile("Usuário inativo! por favor verificar seu acesso");
+                
             } else if (usuario.getSenha().equals(inpSenha)) {
                 VerificarTotem sc = new VerificarTotem(listaUsuarios.get(0), listaEmpresa.get(0));
+                log.writeRecordToLogFile("Login realizado!");
                 sc.setVisible(true);
                 dispose();
 
             } else if (!usuario.getSenha().equals(inpSenha) || inpSenha.length() == 0 || inpEmail.length() == 0) {
                 JOptionPane.showMessageDialog(null, "Email ou Senha inválidos!");
+                log.writeRecordToLogFile("Email ou senha inválidos(as)!");
                 iptSenha.setText("");
                 iptUsuario.setText("");
 
             } else {
                 JOptionPane.showMessageDialog(null, "Houve um error ao tentar realizar o Login!");
+                log.writeRecordToLogFile("Houve um erro ao ralizar o logil");
                 System.exit(0);
             }
 

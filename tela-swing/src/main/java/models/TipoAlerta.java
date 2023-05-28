@@ -30,20 +30,22 @@ public class TipoAlerta {
 
         ConexaoAzure conexaoA = new ConexaoAzure();
         JdbcTemplate conA = conexaoA.getConnection();
+        Log log = new Log();
 
         listaAlertas = new ArrayList();
-
+        log.writeRecordToLogFile("Verificando se já tem Tipos de Alerta...");
         listaAlertas = conA.query("select * from TipoAlerta",
                 new BeanPropertyRowMapper(TipoAlerta.class));
 
         if (listaAlertas.isEmpty()) {
             System.out.println("Vou cadastrar tipos de alertas na Azure");
-            
+            log.writeRecordToLogFile("Cadastrando Tipos de Alerta na Azure...");
             conA.update("insert into TipoAlerta(Criticidade) values ('Ideal'), ('Atenção'), ('Urgente'), ('Crítico')");
             
             validarTiposAlertas();
 
         } else {
+            log.writeRecordToLogFile("Verificando se Tipos de Alertas foram cadastrados...");
             Boolean hasIdeal = true, hasAtencao = true, hasUrgente = true, hasCritico = true;
             for (TipoAlerta alerta : listaAlertas) {
                 Integer id = alerta.getId();
@@ -60,15 +62,19 @@ public class TipoAlerta {
             }
             
             if (hasIdeal) {
+                log.writeRecordToLogFile("Cadastrando Tipo de Alerta Ideal");
                 conA.update("insert into TipoAlerta(Criticidade) values ('Ideal')");
             }
             if (hasAtencao) {
+                log.writeRecordToLogFile("Cadastrando Tipo de Alerta Atenção");
                 conA.update("insert into TipoAlerta(Criticidade) values ('Atenção')");
             }
             if (hasUrgente) {
+                log.writeRecordToLogFile("Cadastrando Tipo de Alerta Urgente");
                 conA.update("insert into TipoAlerta(Criticidade) values ('Urgente')");
             }
             if (hasCritico) {
+                log.writeRecordToLogFile("Cadastrando Tipo de Alerta Critico");
                 conA.update("insert into TipoAlerta(Criticidade) values ('Crítico')");
             }
             
