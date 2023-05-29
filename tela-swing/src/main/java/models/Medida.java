@@ -59,6 +59,8 @@ public class Medida {
         Double porcentagemDisponivel = (volumeDisponivel / volumeTotal) * 100;
         Double porcentagemUsoRam = (usoRAM / totalRam) * 100;
 
+        
+        // Os Bytes são cumulativos, ou seja, sempre aumenta, temos que pegar [tmp1] sobe, [temp1, temp2] (2 - 1) sobe e shifta, [temp2, temp3]... assim temos o minimo de rede que usou;
         List<RedeInterface> redeInterfaces = looca.getRede().getGrupoDeInterfaces().getInterfaces();
         Long redeEnviados = 0L;
         Long redeRecebidos = 0L;
@@ -70,8 +72,9 @@ public class Medida {
 
         Double capacidade = bandaLarga;
 
-        Long taxaTransferencia = (redeEnviados + redeRecebidos) * 5 / 8;
-        String frequenciaFormatada = new DecimalFormat(",##").format(taxaTransferencia / Math.pow(2, 20));
+        Long taxaTransferencia = (redeEnviados + redeRecebidos) / 8;
+        String frequenciaFormatada = String.format("%.2f", taxaTransferencia / Math.pow(2, 20));
+        System.out.println(frequenciaFormatada);        frequenciaFormatada = frequenciaFormatada.replace(",", ".");
         Double usoRede = Double.parseDouble(frequenciaFormatada);
 
         Double percentualRede = usoRede * 100 / capacidade;

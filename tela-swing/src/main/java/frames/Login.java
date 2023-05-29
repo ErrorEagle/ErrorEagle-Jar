@@ -2,31 +2,16 @@ package frames;
 
 import conexoes.ConexaoAzure;
 import models.Empresa;
-
-import java.awt.Color;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import conexoes.ConexaoAzure;
-import models.Empresa;
 import models.Funcionario;
 import java.awt.Color;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import com.github.britooo.looca.api.group.rede.RedeInterface;
-import com.github.britooo.looca.api.group.rede.RedeInterfaceGroup;
 import java.awt.Shape;
 import java.awt.geom.RoundRectangle2D;
-import static javax.swing.UIManager.getString;
-import models.Configuracao;
 import models.Log;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;

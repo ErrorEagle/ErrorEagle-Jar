@@ -9,6 +9,7 @@ import conexoes.ConexaoAzure;
 import models.Totem;
 import com.github.britooo.looca.api.core.Looca;
 import conexoes.ConexaoLocal;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -17,6 +18,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.print.attribute.standard.Media;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import models.Configuracao;
 import models.Empresa;
 import models.Funcionario;
@@ -32,7 +36,6 @@ public class VerificarTotem extends javax.swing.JFrame {
     Looca looca = new Looca();
     Log log = new Log();
     private List<Totem> listaTotem;
-
     private Integer fkEmpresa;
     private Double bandaLarga;
 
@@ -42,6 +45,7 @@ public class VerificarTotem extends javax.swing.JFrame {
         this.fkEmpresa = usuario.getFkEmpresa();
         this.bandaLarga = empresa.getBandaLarga();
 
+
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowOpened(java.awt.event.WindowEvent evt) {
@@ -49,45 +53,88 @@ public class VerificarTotem extends javax.swing.JFrame {
                 Componentes cp = new Componentes();
                 Limite lm = new Limite();
                 Configuracao cf = new Configuracao();
-                // Fazer retorno booleano
-                pbTeste.setValue(07);
-                validarMaquinaRegistrada();
-                pbTeste.setValue(33);
-                cp.validarComponentes();
-                pbTeste.setValue(66);
-                cf.validarConfiguracao(listaTotem.get(0).getId(), bandaLarga);
-                pbTeste.setValue(78);
-                tp.validarTiposAlertas();
-                pbTeste.setValue(99);
-                lm.validarLimites();
+                ConexaoAzure conexaoA = new ConexaoAzure();
+                ConexaoLocal conexaoL = new ConexaoLocal();
+                JdbcTemplate conL = conexaoL.getConnection();
+                JdbcTemplate conA = conexaoA.getConnection();
 
-                jLabel1.setText("Capturando Dados!");
-                iniciarCaptura();
+                // Configurar o valor máximo da barra de progresso
+                pbTeste.setMaximum(100);
 
+                // Configurar o valor inicial da barra de progresso
+                pbTeste.setValue(0);
+
+                // Criar e executar o SwingWorker para realizar as validações em segundo plano
+                                SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        validarMaquinaRegistrada(conA);
+                        publish("Verificando Máquina!;7"); // Atualizar o texto do label e o valor da barra de progresso
+
+                        cp.validarComponentes(conA);
+                        publish("Verificando Componentes!;33"); // Atualizar o texto do label e o valor da barra de progresso
+
+                        cf.validarConfiguracao(listaTotem.get(0).getId(), bandaLarga, conA);
+                        publish("Verificando Configuração!;66"); // Atualizar o texto do label e o valor da barra de progresso
+                        
+                        tp.validarTiposAlertas(conA);
+                        publish("Validando alertas!!;86"); // Atualizar o texto do label e o valor da barra de progresso
+
+                        lm.validarLimites(conA);
+                        publish("Verificando Limites!;100"); // Atualizar o texto do label e o valor da barra de progresso
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void process(List<String> chunks) {
+                        // Último chunk contém a informação mais recente
+                        String[] values = chunks.get(chunks.size() - 1).split(";");
+                        String labelText = values[0];
+                        int progressValue = Integer.parseInt(values[1]);
+
+                        // Atualizar o texto do label
+                        jLabel1.setText(labelText);
+
+                        // Atualizar a barra de progresso com o valor atual
+                        pbTeste.setValue(progressValue);
+                    }
+
+
+                    @Override
+                    protected void done() {
+                        // Executado quando o SwingWorker é concluído
+                        jLabel1.setText("Capturando Dados!");
+                        pbTeste.setVisible(false);
+                        iniciarCaptura();
+                    }
+                };
+
+                // Executar o SwingWorker
+                worker.execute();
             }
         });
+
     }
 
-    private void validarMaquinaRegistrada() {
+    private void validarMaquinaRegistrada(JdbcTemplate con) {
 
-        ConexaoAzure conexaoA = new ConexaoAzure();
-        JdbcTemplate conA = conexaoA.getConnection();
         log.writeRecordToLogFile("Validando se a máquina já está cadastrada...");
         String hostNameAtual = looca.getRede().getParametros().getHostName();
 
         listaTotem = new ArrayList();
 
-        listaTotem = conA.query("select * from Totem where hostName = ?",
+        listaTotem = con.query("select * from Totem where hostName = ?",
                 new BeanPropertyRowMapper(Totem.class), hostNameAtual);
 
         if (listaTotem.isEmpty()) {
 
             log.writeRecordToLogFile("Máquina não cadastrada! Executando cadastro azure...");
-            conA.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
+            con.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
 
             listaTotem = new ArrayList();
 
-            listaTotem = conA.query("select * from Totem where hostName = ?",
+            listaTotem = con.query("select * from Totem where hostName = ?",
                     new BeanPropertyRowMapper(Totem.class), hostNameAtual);
             log.writeRecordToLogFile("Máquina cadastrada!");
 
@@ -98,35 +145,6 @@ public class VerificarTotem extends javax.swing.JFrame {
                 System.exit(0);
             }
         }
-
-        conexaoA.closeConnection();
-
-//   -------------------------------------- LOCAL -----------------------------------------
-        ConexaoLocal conexaoL = new ConexaoLocal();
-        JdbcTemplate conL = conexaoL.getConnection();
-        log.writeRecordToLogFile("Validando se a máquina já está cadastrada no Local...");
-        listaTotem = new ArrayList();
-
-        listaTotem = conA.query("select * from Totem where hostName = ?",
-                new BeanPropertyRowMapper(Totem.class), hostNameAtual);
-
-        if (listaTotem.isEmpty()) {
-            
-            log.writeRecordToLogFile("Máquina não cadastrada localmente! Executando cadastro local...");
-            conL.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
-            
-            listaTotem = conL.query("select * from Totem where hostName = ?",
-                    new BeanPropertyRowMapper(Totem.class), hostNameAtual);
-
-        } else {
-            if (!listaTotem.get(0).getFkEmpresa().equals(fkEmpresa)) {
-                JOptionPane.showMessageDialog(null, "Essa máquina já está cadastrata em outra empresa!");
-                log.writeRecordToLogFile("Máquina cadastrada em outra empresa!");
-                System.exit(0);
-            }
-        }
-
-        conexaoL.closeConnection();
     }
 
     public void iniciarCaptura() {
@@ -154,12 +172,12 @@ public class VerificarTotem extends javax.swing.JFrame {
         setPreferredSize(new java.awt.Dimension(460, 290));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Georgia", 1, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Century", 1, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("j");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 70, 280, 90));
-        getContentPane().add(pbTeste, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 160, 270, 10));
+        jLabel1.setText("Aguarde!");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 100, 270, 60));
+        getContentPane().add(pbTeste, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 160, 270, 20));
 
         pack();
         setLocationRelativeTo(null);

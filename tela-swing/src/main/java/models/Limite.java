@@ -26,31 +26,29 @@ public class Limite {
     public Limite() {
     }
 
-    public void validarLimites() {
+    public void validarLimites(JdbcTemplate con) {
 
-        validarLimiteIdeal();
-        validarLimiteAtencao();
-        validarLimiteUrgente();
-        validarLimiteCritico();
+        validarLimiteIdeal(con);
+        validarLimiteAtencao(con);
+        validarLimiteUrgente(con);
+        validarLimiteCritico(con);
 
     }
 
-    public void validarLimiteIdeal() {
-        ConexaoAzure conexaoA = new ConexaoAzure();
-        JdbcTemplate conA = conexaoA.getConnection();
+    public void validarLimiteIdeal(JdbcTemplate con) {
 
         listaLimites = new ArrayList();
 
-        listaLimites = conA.query("select * from Limite where fkTipoAlerta = 1", new BeanPropertyRowMapper(Limite.class));
+        listaLimites = con.query("select * from Limite where fkTipoAlerta = 1", new BeanPropertyRowMapper(Limite.class));
 
         if (listaLimites.isEmpty()) {
 
             Configuracao cf = new Configuracao();
             // Cadastrar os limites dos componentes
             log.writeRecordToLogFile("Inserindo Limites Ideis aos Componentes...");
-            conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 1, 50.0, 0.0), (1, 2, 50.0, 0.0), (1, 3, 50.0, 0.0), (1, 4, 50.0, 0.0)");
+            con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 1, 50.0, 0.0), (1, 2, 50.0, 0.0), (1, 3, 50.0, 0.0), (1, 4, 50.0, 0.0)");
 
-            validarLimiteIdeal();
+            validarLimiteIdeal(con);
 
         } else {
             log.writeRecordToLogFile("Verificando se todos os Limites Ideais foram cadastrados...");
@@ -77,41 +75,39 @@ public class Limite {
 
             if (hasCPU) {
                 log.writeRecordToLogFile("Cadastrando Limite da CPU");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 1, 50.0, 0.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 1, 50.0, 0.0)");
             }
             if (hasRAM) {
                 log.writeRecordToLogFile("Cadastrando Limite da RAM");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 2, 50.0, 0.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 2, 50.0, 0.0)");
             }
             if (hasDisco) {
                 log.writeRecordToLogFile("Cadastrando Limite da DISCO");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 3, 50.0, 0.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 3, 50.0, 0.0)");
             }
             if (hasRede) {
                 log.writeRecordToLogFile("Cadastrando Limite da REDE");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 4, 50.0, 0.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 4, 50.0, 0.0)");
             }
 
         }
-        conexaoA.closeConnection();
+        
     }
 
-    public void validarLimiteAtencao() {
-        ConexaoAzure conexaoA = new ConexaoAzure();
-        JdbcTemplate conA = conexaoA.getConnection();
+    public void validarLimiteAtencao(JdbcTemplate con) {
 
         listaLimites = new ArrayList();
         log.writeRecordToLogFile("Verificando se já existem Limites de Atenção...");
-        listaLimites = conA.query("select * from Limite where fkTipoAlerta = 2", new BeanPropertyRowMapper(Limite.class));
+        listaLimites = con.query("select * from Limite where fkTipoAlerta = 2", new BeanPropertyRowMapper(Limite.class));
 
         if (listaLimites.isEmpty()) {
 
             Configuracao cf = new Configuracao();
             // Cadastrar os limites dos componentes
             log.writeRecordToLogFile("Cadastrando Limites de Atenção");
-            conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (2, 1, 75.0, 50.0), (2, 2, 75.0, 50.0), (2, 3, 75.0, 50.0), (2, 4, 75.0, 50.0)");
+            con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (2, 1, 75.0, 50.0), (2, 2, 75.0, 50.0), (2, 3, 75.0, 50.0), (2, 4, 75.0, 50.0)");
 
-            validarLimiteIdeal();
+            validarLimiteIdeal(con);
 
         } else {
             log.writeRecordToLogFile("Verificando se Limites de Atenção foram cadastrados...");
@@ -137,41 +133,39 @@ public class Limite {
             }
             if (hasCPU) {
                 log.writeRecordToLogFile("Cadastrando Limite de Alerta da CPU");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (2, 1, 75.0, 50.0");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (2, 1, 75.0, 50.0");
             }
             if (hasRAM) {
                 log.writeRecordToLogFile("Cadastrando Limite de Alerta da RAM");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (2, 2, 75.0, 50.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (2, 2, 75.0, 50.0)");
             }
             if (hasDisco) {
                 log.writeRecordToLogFile("Cadastrando Limite de Alerta do DISCO");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (2, 3, 75.0, 50.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (2, 3, 75.0, 50.0)");
             }
             if (hasRede) {
                 log.writeRecordToLogFile("Cadastrando Limite de Alerta da REDE");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (2, 4, 75.0, 50.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (2, 4, 75.0, 50.0)");
             }
 
         }
-        conexaoA.closeConnection();
     }
 
-    public void validarLimiteUrgente() {
-        ConexaoAzure conexaoA = new ConexaoAzure();
-        JdbcTemplate conA = conexaoA.getConnection();
+    public void validarLimiteUrgente(JdbcTemplate con) {
+
 
         listaLimites = new ArrayList();
         log.writeRecordToLogFile("Verificando se já existem Limites Urgentes");
-        listaLimites = conA.query("select * from Limite where fkTipoAlerta = 3", new BeanPropertyRowMapper(Limite.class));
+        listaLimites = con.query("select * from Limite where fkTipoAlerta = 3", new BeanPropertyRowMapper(Limite.class));
 
         if (listaLimites.isEmpty()) {
             
             Configuracao cf = new Configuracao();
             // Cadastrar os limites dos componentes
             log.writeRecordToLogFile("Cadastrando Limites de Urgência...");
-            conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (3, 1, 90.0, 75.0), (3, 2, 90.0, 75.0), (3, 3, 90.0, 75.0), (3, 4, 90.0, 75.0)");
+            con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (3, 1, 90.0, 75.0), (3, 2, 90.0, 75.0), (3, 3, 90.0, 75.0), (3, 4, 90.0, 75.0)");
 
-            validarLimiteIdeal();
+            validarLimiteIdeal(con);
 
         } else {
             log.writeRecordToLogFile("Verificando se os Limites de Urgência foram cadastrados...");
@@ -198,41 +192,39 @@ public class Limite {
 
             if (hasCPU) {
                 log.writeRecordToLogFile("Cadastrando Limite Urgente da CPU");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 1, 90.0, 75.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 1, 90.0, 75.0)");
             }
             if (hasRAM) {
                 log.writeRecordToLogFile("Cadastrando Limite Urgente da RAM");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 2, 90.0, 75.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 2, 90.0, 75.0)");
             }
             if (hasDisco) {
                 log.writeRecordToLogFile("Cadastrando Limite Urgente do DISCO");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 3, 90.0, 75.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 3, 90.0, 75.0)");
             }
             if (hasRede) {
                 log.writeRecordToLogFile("Cadastrando Limite Urgente da REDE");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 4, 90.0, 75.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 4, 90.0, 75.0)");
             }
 
         }
-        conexaoA.closeConnection();
+
     }
 
-    public void validarLimiteCritico() {
-        ConexaoAzure conexaoA = new ConexaoAzure();
-        JdbcTemplate conA = conexaoA.getConnection();
+    public void validarLimiteCritico(JdbcTemplate con) {
 
         listaLimites = new ArrayList();
         log.writeRecordToLogFile("Verificando se Limites Criticos estão cadastrados...");
-        listaLimites = conA.query("select * from Limite where fkTipoAlerta = 4", new BeanPropertyRowMapper(Limite.class));
+        listaLimites = con.query("select * from Limite where fkTipoAlerta = 4", new BeanPropertyRowMapper(Limite.class));
 
         if (listaLimites.isEmpty()) {
             log.writeRecordToLogFile("Cadastrando Limites Criticos...");
             Configuracao cf = new Configuracao();
             // Cadastrar os limites dos componentes
 
-            conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (4, 1, 100.0, 90.0), (4, 2, 100.0, 90.0), (4, 3, 100.0, 90.0), (4, 4, 100.0, 90.0)");
+            con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (4, 1, 100.0, 90.0), (4, 2, 100.0, 90.0), (4, 3, 100.0, 90.0), (4, 4, 100.0, 90.0)");
 
-            validarLimiteIdeal();
+            validarLimiteIdeal(con);
 
         } else {
             log.writeRecordToLogFile("Verificando se Limites Criticos foram cadastrados...");
@@ -259,23 +251,23 @@ public class Limite {
             
             if (hasCPU) {
                 log.writeRecordToLogFile("Cadastrando Limite Critico da CPU");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (4, 1, 100.0, 90.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (4, 1, 100.0, 90.0)");
             }
             if (hasRAM) {
                 log.writeRecordToLogFile("Cadastrando Limite Critico da RAM");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (4, 2, 100.0, 90.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (4, 2, 100.0, 90.0)");
             }
             if (hasDisco) {
                 log.writeRecordToLogFile("Cadastrando Limite Critico do DISCO");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (4, 3, 100.0, 90.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (4, 3, 100.0, 90.0)");
             }
             if (hasRede) {
                 log.writeRecordToLogFile("Cadastrando Limite Critico da REDE");
-                conA.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (4, 4, 100.0, 90.0)");
+                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (4, 4, 100.0, 90.0)");
             }
 
         }
-        conexaoA.closeConnection();
+      
     }
 
     public Double getMaximo() {
