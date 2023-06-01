@@ -9,6 +9,7 @@ import com.github.britooo.looca.api.group.discos.DiscoGrupo;
 import com.github.britooo.looca.api.group.discos.Volume;
 import com.github.britooo.looca.api.group.rede.RedeInterface;
 import conexoes.ConexaoAzure;
+import conexoes.ConexaoLocal;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +34,8 @@ public class Medida {
 
         ConexaoAzure conexaoA = new ConexaoAzure();
         JdbcTemplate conA = conexaoA.getConnection();
+        ConexaoLocal conexaoL = new ConexaoLocal();
+        JdbcTemplate conL = conexaoL.getConnection();
 
         LocalDateTime dataHora = LocalDateTime.now();
 
@@ -84,12 +87,26 @@ public class Medida {
                 dataHora,
                 id
         );
+        conL.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,1)",
+                usoCPU,
+                dataHora,
+                id
+        );
+        
+        
         log.writeRecordToLogFile("Inserindos Medida da RAM");
         conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,2)",
                 porcentagemUsoRam,
                 dataHora,
                 id
         );
+        conL.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,2)",
+                porcentagemUsoRam,
+                dataHora,
+                id
+        );
+        
+        
 
         log.writeRecordToLogFile("Inserindos Medida do DISCO");
         conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,3)",
@@ -97,9 +114,21 @@ public class Medida {
                 dataHora,
                 id
         );
+        conL.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,3)",
+                porcentagemDisponivel,
+                dataHora,
+                id
+        );
+        
+        
 
         log.writeRecordToLogFile("Inserindos Medida da REDE");
         conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,4)",
+                percentualRede,
+                dataHora,
+                id
+        );
+        conL.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,4)",
                 percentualRede,
                 dataHora,
                 id

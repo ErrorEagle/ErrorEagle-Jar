@@ -68,7 +68,7 @@ public class VerificarTotem extends javax.swing.JFrame {
                                 SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
                     @Override
                     protected Void doInBackground() throws Exception {
-                        validarMaquinaRegistrada(conA);
+                        validarMaquinaRegistrada(conA, conL);
                         publish("Verificando Máquina!;7"); // Atualizar o texto do label e o valor da barra de progresso
 
                         cp.validarComponentes(conA);
@@ -117,7 +117,7 @@ public class VerificarTotem extends javax.swing.JFrame {
 
     }
 
-    private void validarMaquinaRegistrada(JdbcTemplate con) {
+    private void validarMaquinaRegistrada(JdbcTemplate con, JdbcTemplate con2) {
 
         log.writeRecordToLogFile("Validando se a máquina já está cadastrada...");
         String hostNameAtual = looca.getRede().getParametros().getHostName();
@@ -131,6 +131,7 @@ public class VerificarTotem extends javax.swing.JFrame {
 
             log.writeRecordToLogFile("Máquina não cadastrada! Executando cadastro azure...");
             con.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
+            con2.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
 
             listaTotem = new ArrayList();
 
