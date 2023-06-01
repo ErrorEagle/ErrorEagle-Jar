@@ -127,19 +127,16 @@ public class VerificarTotem extends javax.swing.JFrame {
                 new BeanPropertyRowMapper(Totem.class), hostNameAtual);
 
         if (listaTotem.isEmpty()) {
-            try {
-                log.writeRecordToLogFile("Máquina não cadastrada! Executando cadastro azure...");
-                con.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
-                con2.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
 
-                listaTotem = new ArrayList();
+            log.writeRecordToLogFile("Máquina não cadastrada! Executando cadastro azure...");
+            con.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
+            con2.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
 
-                listaTotem = con.query("select * from Totem where hostName = ?",
-                        new BeanPropertyRowMapper(Totem.class), hostNameAtual);
-                log.writeRecordToLogFile("Máquina cadastrada!");
-            } catch (Exception e) {
-                log.writeRecordToLogFile(e.getMessage());
-            }
+            listaTotem = new ArrayList();
+
+            listaTotem = con.query("select * from Totem where hostName = ?",
+                    new BeanPropertyRowMapper(Totem.class), hostNameAtual);
+            log.writeRecordToLogFile("Máquina cadastrada!");
 
         } else {
             if (!listaTotem.get(0).getFkEmpresa().equals(fkEmpresa)) {
