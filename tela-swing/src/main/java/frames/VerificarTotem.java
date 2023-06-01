@@ -10,6 +10,7 @@ import models.Totem;
 import com.github.britooo.looca.api.core.Looca;
 import conexoes.ConexaoLocal;
 import java.awt.Color;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -45,7 +46,6 @@ public class VerificarTotem extends javax.swing.JFrame {
         this.fkEmpresa = usuario.getFkEmpresa();
         this.bandaLarga = empresa.getBandaLarga();
 
-
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowOpened(java.awt.event.WindowEvent evt) {
@@ -65,7 +65,7 @@ public class VerificarTotem extends javax.swing.JFrame {
                 pbTeste.setValue(0);
 
                 // Criar e executar o SwingWorker para realizar as validações em segundo plano
-                                SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
+                SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
                     @Override
                     protected Void doInBackground() throws Exception {
                         validarMaquinaRegistrada(conA, conL);
@@ -76,7 +76,7 @@ public class VerificarTotem extends javax.swing.JFrame {
 
                         cf.validarConfiguracao(listaTotem.get(0).getId(), bandaLarga, conA);
                         publish("Verificando Configuração!;66"); // Atualizar o texto do label e o valor da barra de progresso
-                        
+
                         tp.validarTiposAlertas(conA);
                         publish("Validando alertas!!;86"); // Atualizar o texto do label e o valor da barra de progresso
 
@@ -99,7 +99,6 @@ public class VerificarTotem extends javax.swing.JFrame {
                         // Atualizar a barra de progresso com o valor atual
                         pbTeste.setValue(progressValue);
                     }
-
 
                     @Override
                     protected void done() {
@@ -128,16 +127,19 @@ public class VerificarTotem extends javax.swing.JFrame {
                 new BeanPropertyRowMapper(Totem.class), hostNameAtual);
 
         if (listaTotem.isEmpty()) {
+            try {
+                log.writeRecordToLogFile("Máquina não cadastrada! Executando cadastro azure...");
+                con.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
+                con2.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
 
-            log.writeRecordToLogFile("Máquina não cadastrada! Executando cadastro azure...");
-            con.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
-            con2.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
+                listaTotem = new ArrayList();
 
-            listaTotem = new ArrayList();
-
-            listaTotem = con.query("select * from Totem where hostName = ?",
-                    new BeanPropertyRowMapper(Totem.class), hostNameAtual);
-            log.writeRecordToLogFile("Máquina cadastrada!");
+                listaTotem = con.query("select * from Totem where hostName = ?",
+                        new BeanPropertyRowMapper(Totem.class), hostNameAtual);
+                log.writeRecordToLogFile("Máquina cadastrada!");
+            } catch (Exception e) {
+                log.writeRecordToLogFile(e.getMessage());
+            }
 
         } else {
             if (!listaTotem.get(0).getFkEmpresa().equals(fkEmpresa)) {
@@ -156,6 +158,8 @@ public class VerificarTotem extends javax.swing.JFrame {
                 log.writeRecordToLogFile("Capturando dados...");
                 medida.inserirMedidas(listaTotem.get(0).getId(), bandaLarga);
                 // Restante do código...
+
+                System.out.println(listaTotem);
             }
         }, 0, 5000);
     }
@@ -174,7 +178,6 @@ public class VerificarTotem extends javax.swing.JFrame {
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Century", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Aguarde!");
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 100, 270, 60));
