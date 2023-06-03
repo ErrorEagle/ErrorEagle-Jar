@@ -14,14 +14,14 @@ import com.github.britooo.looca.api.core.Looca;
 public class Log {
 
 	private Looca looca = new Looca();
-        private String LOG_FILE_PATH = "/home/ubuntu/Desktop/logs/log.txt";
+        private String LOG_FILE_PATH = "c:/logs/log.txt";
 //	private String LOG_FILE_PATH = "/home/ubuntu/Desktop/logs/log.txt";
 	private Boolean primeiraLinha = false;
 	private final int INSERT_LINE = 6;
 	private String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 
 	public String buildLogEntry(String name) {
-            File pasta = new File("/home/ubuntu/Desktop/logs/");
+            File pasta = new File("c:/logs/");
             
             if (!pasta.exists()) {
                 pasta.mkdir();

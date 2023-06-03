@@ -122,17 +122,17 @@ public class Medida {
         
         
 
-        log.writeRecordToLogFile("Inserindos Medida da REDE");
-        conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,4)",
-                percentualRede,
-                dataHora,
-                id
-        );
-        conL.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,4)",
-                percentualRede,
-                dataHora,
-                id
-        );
+//        log.writeRecordToLogFile("Inserindos Medida da REDE");
+//        conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,4)",
+//                percentualRede,
+//                dataHora,
+//                id
+//        );
+//        conL.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,4)",
+//                percentualRede,
+//                dataHora,
+//                id
+//        );
 
     }
 

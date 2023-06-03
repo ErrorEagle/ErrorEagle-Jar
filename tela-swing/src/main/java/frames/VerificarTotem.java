@@ -132,11 +132,8 @@ public class VerificarTotem extends javax.swing.JFrame {
             con.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
             con2.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
 
-            listaTotem = new ArrayList();
-
-            listaTotem = con.query("select * from Totem where hostName = ?",
-                    new BeanPropertyRowMapper(Totem.class), hostNameAtual);
             log.writeRecordToLogFile("Máquina cadastrada!");
+            validarMaquinaRegistrada(con, con2);
 
         } else {
             if (!listaTotem.get(0).getFkEmpresa().equals(fkEmpresa)) {
