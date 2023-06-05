@@ -68,8 +68,6 @@ public class Login extends javax.swing.JFrame {
         txtLogin = new javax.swing.JLabel();
         txtSenha = new javax.swing.JLabel();
         tittleEagle1 = new javax.swing.JLabel();
-        ErroEagleBanner = new javax.swing.JLabel();
-        BotãoClose = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ErrorEagle - Login");
@@ -153,17 +151,6 @@ public class Login extends javax.swing.JFrame {
         tittleEagle1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jPanel1.add(tittleEagle1, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 100, 50, -1));
 
-        ErroEagleBanner.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ErrorEagle.png"))); // NOI18N
-        jPanel1.add(ErroEagleBanner, new org.netbeans.lib.awtextra.AbsoluteConstraints(-170, 0, 470, 390));
-
-        BotãoClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/close.png"))); // NOI18N
-        BotãoClose.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BotãoCloseMouseClicked(evt);
-            }
-        });
-        jPanel1.add(BotãoClose, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 10, -1, 40));
-
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 610, 340));
 
         pack();
@@ -244,10 +231,6 @@ public class Login extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnLoginMouseClicked
 
-    private void BotãoCloseMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotãoCloseMouseClicked
-        System.exit(0);
-    }//GEN-LAST:event_BotãoCloseMouseClicked
-
     /**
      * @param args the command line arguments
      */
@@ -312,8 +295,6 @@ public class Login extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel BotãoClose;
-    private javax.swing.JLabel ErroEagleBanner;
     private javax.swing.JButton btnLogin;
     private javax.swing.JPasswordField iptSenha;
     private javax.swing.JTextField iptUsuario;

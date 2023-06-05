@@ -98,7 +98,7 @@ public class VerificarTotem extends javax.swing.JFrame {
                         lblTitulo.setText("Capturando Dados!");
                         Medida md = new Medida();
                         iniciarCaptura(conA, md);
-                        iniciarCaptura(conL, md);
+//                        iniciarCaptura(conL, md);
                         agendamentoVerificacao(md);
                     }
                 };
@@ -163,13 +163,14 @@ public class VerificarTotem extends javax.swing.JFrame {
         ScheduledExecutorService scheduler1 = Executors.newScheduledThreadPool(1);
         scheduler1.scheduleAtFixedRate(() -> {
             LocalDateTime date = LocalDateTime.now();
-            System.out.println("Função executada a cada 5 minuto: " + date);
             try {
+                System.out.println("Agendando CPU:");
                 md.verificarAlerta(con, fkTotem, 1, md.verificarMedida(con, date, fkTotem, 1, 3));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             try {
+                System.out.println("Agendando RAM:");
                 md.verificarAlerta(con, fkTotem, 2, md.verificarMedida(con, date, fkTotem, 2, 3));
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -180,8 +181,8 @@ public class VerificarTotem extends javax.swing.JFrame {
         ScheduledExecutorService scheduler3 = Executors.newScheduledThreadPool(1);
         scheduler3.scheduleAtFixedRate(() -> {
             LocalDateTime date = LocalDateTime.now();
-            System.out.println("Função executada a cada 10 minutos: " + date);
             try {
+                System.out.println("Agendando Disco:");
                 md.verificarAlerta(con, fkTotem, 3, md.verificarMedida(con, date, fkTotem, 3, 10));
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -192,9 +193,8 @@ public class VerificarTotem extends javax.swing.JFrame {
         ScheduledExecutorService scheduler2 = Executors.newScheduledThreadPool(1);
         scheduler1.scheduleAtFixedRate(() -> {
             LocalDateTime date = LocalDateTime.now();
-            System.out.println("Função executada a cada 1 minuto rede: " + date);
-
             try {
+                System.out.println("Agendando Rede:");
                 md.verificarAlertaRede(con, fkTotem, 4, md.verificarMedidaRede(con, fkTotem, 4));
             } catch (InterruptedException ex) {
                 Logger.getLogger(VerificarTotem.class.getName()).log(Level.SEVERE, null, ex);

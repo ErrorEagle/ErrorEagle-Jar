@@ -10,6 +10,7 @@ import com.github.britooo.looca.api.group.discos.Volume;
 import conexao.ConexaoAzure;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -114,11 +115,14 @@ public class Medida {
     }
 
     public void verificarAlerta(JdbcTemplate con, Integer id ,Integer componente, Double media) throws IOException {
+     
         String tipoComponente = "";
         String simbolo = "";
         System.out.println("Select 2");
         String SELECT_QUERY = "SELECT l.fkComponente, l.maximo, l.minimo, ta.Criticidade FROM Limite l JOIN TipoAlerta ta ON l.fkTipoAlerta = ta.id WHERE l.fkComponente = ?;";
-        List<Limite> limites = con.query(SELECT_QUERY, new BeanPropertyRowMapper<>(Limite.class), componente);
+       
+         List<Limite> limites = con.query(SELECT_QUERY, new BeanPropertyRowMapper<>(Limite.class), componente);
+        
         switch (componente) {
             case 1:
                 tipoComponente = "CPU";
