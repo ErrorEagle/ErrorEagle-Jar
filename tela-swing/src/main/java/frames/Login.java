@@ -1,6 +1,6 @@
 package frames;
 
-import conexoes.ConexaoAzure;
+import conexao.ConexaoAzure;
 import models.Empresa;
 import models.Funcionario;
 import java.awt.Color;

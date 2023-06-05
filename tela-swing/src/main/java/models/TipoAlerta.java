@@ -5,7 +5,7 @@
 package models;
 
 import com.github.britooo.looca.api.core.Looca;
-import conexoes.ConexaoAzure;
+import conexao.ConexaoAzure;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;

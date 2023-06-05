@@ -5,15 +5,20 @@
 package frames;
 
 import models.Componentes;
-import conexoes.ConexaoAzure;
+import conexao.ConexaoAzure;
 import models.Totem;
 import com.github.britooo.looca.api.core.Looca;
-import conexoes.ConexaoLocal;
+import conexao.ConexaoLocal;
 import java.awt.Color;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.print.attribute.standard.Media;
@@ -45,7 +50,6 @@ public class VerificarTotem extends javax.swing.JFrame {
         this.fkEmpresa = usuario.getFkEmpresa();
         this.bandaLarga = empresa.getBandaLarga();
 
-
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowOpened(java.awt.event.WindowEvent evt) {
@@ -58,59 +62,47 @@ public class VerificarTotem extends javax.swing.JFrame {
                 JdbcTemplate conL = conexaoL.getConnection();
                 JdbcTemplate conA = conexaoA.getConnection();
 
-                // Configurar o valor máximo da barra de progresso
-                pbTeste.setMaximum(100);
-
-                // Configurar o valor inicial da barra de progresso
-                pbTeste.setValue(0);
-
                 // Criar e executar o SwingWorker para realizar as validações em segundo plano
-                                SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
+                SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
                     @Override
                     protected Void doInBackground() throws Exception {
                         validarMaquinaRegistrada(conA);
-                        publish("Verificando Máquina!;7"); // Atualizar o texto do label e o valor da barra de progresso
+                        publish("Verificando Máquina!");
 
                         cp.validarComponentes(conA);
-                        publish("Verificando Componentes!;33"); // Atualizar o texto do label e o valor da barra de progresso
+                        publish("Verificando Componentes!");
 
                         cf.validarConfiguracao(listaTotem.get(0).getId(), bandaLarga, conA);
-                        publish("Verificando Configuração!;66"); // Atualizar o texto do label e o valor da barra de progresso
-                        
+                        publish("Verificando Configuração!");
+
                         tp.validarTiposAlertas(conA);
-                        publish("Validando alertas!!;86"); // Atualizar o texto do label e o valor da barra de progresso
+                        publish("Validando alertas!");
 
                         lm.validarLimites(conA);
-                        publish("Verificando Limites!;100"); // Atualizar o texto do label e o valor da barra de progresso
+                        publish("Verificando Limites!");
 
                         return null;
                     }
 
                     @Override
                     protected void process(List<String> chunks) {
-                        // Último chunk contém a informação mais recente
-                        String[] values = chunks.get(chunks.size() - 1).split(";");
-                        String labelText = values[0];
-                        int progressValue = Integer.parseInt(values[1]);
 
-                        // Atualizar o texto do label
-                        jLabel1.setText(labelText);
+                        String labelText = chunks.get(0);
+                        lblTitulo.setText(labelText);
 
-                        // Atualizar a barra de progresso com o valor atual
-                        pbTeste.setValue(progressValue);
                     }
-
 
                     @Override
                     protected void done() {
-                        // Executado quando o SwingWorker é concluído
-                        jLabel1.setText("Capturando Dados!");
-                        pbTeste.setVisible(false);
-                        iniciarCaptura();
+             
+                        lblTitulo.setText("Capturando Dados!");
+                        Medida md = new Medida();
+                        iniciarCaptura(conA, md);
+                        iniciarCaptura(conL, md);
+                        agendamentoVerificacao(md);
                     }
                 };
 
-                // Executar o SwingWorker
                 worker.execute();
             }
         });
@@ -147,45 +139,99 @@ public class VerificarTotem extends javax.swing.JFrame {
         }
     }
 
-    public void iniciarCaptura() {
-        Medida medida = new Medida();
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                log.writeRecordToLogFile("Capturando dados...");
-                medida.inserirMedidas(listaTotem.get(0).getId(), bandaLarga);
-                // Restante do código...
+    public void iniciarCaptura(JdbcTemplate con, Medida md) {
+
+        Integer fkTotem = listaTotem.get(0).getId();
+        // Agendamento para inserção das medidas do totem a cada 20 segundos
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(() -> {
+            log.writeRecordToLogFile("Capturando dados...");
+            md.inserirMedidas(fkTotem, bandaLarga, con);
+        }, 0, 20, TimeUnit.SECONDS);
+
+       
+
+    }
+    
+    public void agendamentoVerificacao(Medida md) {
+       
+        ConexaoAzure conexaoA = new ConexaoAzure();
+        JdbcTemplate con = conexaoA.getConnection();
+        Integer fkTotem = listaTotem.get(0).getId();
+        
+         // Agendamento para verificação de alertas a cada 5 minuto
+        ScheduledExecutorService scheduler1 = Executors.newScheduledThreadPool(1);
+        scheduler1.scheduleAtFixedRate(() -> {
+            LocalDateTime date = LocalDateTime.now();
+            System.out.println("Função executada a cada 5 minuto: " + date);
+            try {
+                md.verificarAlerta(con, fkTotem, 1, md.verificarMedida(con, date, fkTotem, 1, 3));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        }, 0, 5000);
+            try {
+                md.verificarAlerta(con, fkTotem, 2, md.verificarMedida(con, date, fkTotem, 2, 3));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }, 0, 5, TimeUnit.MINUTES);
+
+        // Agendamento para verificação de alertas a cada 10 minutos
+        ScheduledExecutorService scheduler3 = Executors.newScheduledThreadPool(1);
+        scheduler3.scheduleAtFixedRate(() -> {
+            LocalDateTime date = LocalDateTime.now();
+            System.out.println("Função executada a cada 10 minutos: " + date);
+            try {
+                md.verificarAlerta(con, fkTotem, 3, md.verificarMedida(con, date, fkTotem, 3, 10));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }, 0, 10, TimeUnit.MINUTES);
+
+        // Agendamento para verificação de alertas de rede a cada 1 minuto
+        ScheduledExecutorService scheduler2 = Executors.newScheduledThreadPool(1);
+        scheduler1.scheduleAtFixedRate(() -> {
+            LocalDateTime date = LocalDateTime.now();
+            System.out.println("Função executada a cada 1 minuto rede: " + date);
+
+            try {
+                md.verificarAlertaRede(con, fkTotem, 4, md.verificarMedidaRede(con, fkTotem, 4));
+            } catch (InterruptedException ex) {
+                Logger.getLogger(VerificarTotem.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }, 0, 1, TimeUnit.MINUTES);
     }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        pbTeste = new javax.swing.JProgressBar();
+        lblTitulo = new javax.swing.JLabel();
+        background = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Teste de Tela");
+        setTitle("Captura de Dados");
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(460, 290));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Century", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Aguarde!");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 100, 270, 60));
-        getContentPane().add(pbTeste, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 160, 270, 20));
+        lblTitulo.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        lblTitulo.setForeground(new java.awt.Color(51, 255, 0));
+        lblTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTitulo.setText("Aguarde!");
+        getContentPane().add(lblTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 80, 350, 60));
+
+        background.setBackground(new java.awt.Color(51, 51, 51));
+        background.setOpaque(true);
+        getContentPane().add(background, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 450, 290));
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JProgressBar pbTeste;
+    private javax.swing.JLabel background;
+    private javax.swing.JLabel lblTitulo;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -7,7 +7,7 @@ package models;
 import com.github.britooo.looca.api.core.Looca;
 import com.github.britooo.looca.api.group.discos.Disco;
 import com.github.britooo.looca.api.group.discos.DiscoGrupo;
-import conexoes.ConexaoAzure;
+import conexao.ConexaoAzure;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;

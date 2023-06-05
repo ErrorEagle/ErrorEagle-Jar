@@ -4,7 +4,7 @@
  */
 package models;
 
-import conexoes.ConexaoAzure;
+import conexao.ConexaoAzure;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -19,6 +19,7 @@ public class Limite {
     private Integer fkComponente;
     private Double maximo;
     private Double minimo;
+    private String criticidade;
     private List<Limite> listaLimites;
     
     Log log = new Log();
@@ -294,6 +295,14 @@ public class Limite {
         this.fkComponente = fkComponente;
     }
 
+    public String getCriticidade() {
+        return criticidade;
+    }
+
+    public void setCriticidade(String criticidade) {
+        this.criticidade = criticidade;
+    }
+    
     @Override
     public String toString() {
         return "Limite{" + "maximo=" + maximo + ", minimo=" + minimo + '}';
