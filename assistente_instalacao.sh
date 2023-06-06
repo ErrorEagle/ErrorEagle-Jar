@@ -68,11 +68,11 @@ echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Baixando a image d
 echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Confirmando o download da image:  "
                         sleep 2
                         sudo docker images
+                        clear
 
 echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Criando o Container mysql e o banco de dados..."
                         sleep 2
                         sudo docker run -d -p 3306:3306 --name ContainerSQL -e "MYSQL_DATABASE=erroreagle" -e "MYSQL_ROOT_PASSWORD=urubu100" mysql:8.0
-                        clear
 
 echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Acessando Container e criando as tabelas: "
                         sleep 2

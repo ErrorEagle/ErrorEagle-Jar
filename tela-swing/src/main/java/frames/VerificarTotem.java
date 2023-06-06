@@ -66,19 +66,19 @@ public class VerificarTotem extends javax.swing.JFrame {
                 SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
                     @Override
                     protected Void doInBackground() throws Exception {
-                        validarMaquinaRegistrada(conA);
+                        validarMaquinaRegistrada(conA, conL);
                         publish("Verificando Máquina!");
 
-                        cp.validarComponentes(conA);
+                        cp.validarComponentes(conA, conL);
                         publish("Verificando Componentes!");
 
-                        cf.validarConfiguracao(listaTotem.get(0).getId(), bandaLarga, conA);
+                        cf.validarConfiguracao(listaTotem.get(0).getId(), bandaLarga, conA, conL);
                         publish("Verificando Configuração!");
 
-                        tp.validarTiposAlertas(conA);
+                        tp.validarTiposAlertas(conA, conL);
                         publish("Validando alertas!");
 
-                        lm.validarLimites(conA);
+                        lm.validarLimites(conA, conL);
                         publish("Verificando Limites!");
 
                         return null;
@@ -97,7 +97,7 @@ public class VerificarTotem extends javax.swing.JFrame {
              
                         lblTitulo.setText("Capturando Dados!");
                         Medida md = new Medida();
-                        iniciarCaptura(conA, md);
+                        iniciarCaptura(conA, conL, md);
 //                        iniciarCaptura(conL, md);
                         agendamentoVerificacao(md);
                     }
@@ -109,24 +109,25 @@ public class VerificarTotem extends javax.swing.JFrame {
 
     }
 
-    private void validarMaquinaRegistrada(JdbcTemplate con) {
+    private void validarMaquinaRegistrada(JdbcTemplate conA, JdbcTemplate conL) {
 
         log.writeRecordToLogFile("Validando se a máquina já está cadastrada...");
         String hostNameAtual = looca.getRede().getParametros().getHostName();
 
         listaTotem = new ArrayList();
 
-        listaTotem = con.query("select * from Totem where hostName = ?",
+        listaTotem = conA.query("select * from Totem where hostName = ?",
                 new BeanPropertyRowMapper(Totem.class), hostNameAtual);
 
         if (listaTotem.isEmpty()) {
 
             log.writeRecordToLogFile("Máquina não cadastrada! Executando cadastro azure...");
-            con.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
+            conA.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
+            conL.update("insert into Totem(hostName, fkEmpresa) values (?, ?)", hostNameAtual, fkEmpresa);
 
             listaTotem = new ArrayList();
 
-            listaTotem = con.query("select * from Totem where hostName = ?",
+            listaTotem = conA.query("select * from Totem where hostName = ?",
                     new BeanPropertyRowMapper(Totem.class), hostNameAtual);
             log.writeRecordToLogFile("Máquina cadastrada!");
 
@@ -139,14 +140,14 @@ public class VerificarTotem extends javax.swing.JFrame {
         }
     }
 
-    public void iniciarCaptura(JdbcTemplate con, Medida md) {
+    public void iniciarCaptura(JdbcTemplate conA, JdbcTemplate conL, Medida md) {
 
         Integer fkTotem = listaTotem.get(0).getId();
         // Agendamento para inserção das medidas do totem a cada 20 segundos
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(() -> {
             log.writeRecordToLogFile("Capturando dados...");
-            md.inserirMedidas(fkTotem, bandaLarga, con);
+            md.inserirMedidas(fkTotem, bandaLarga, conA, conL);
         }, 0, 20, TimeUnit.SECONDS);
 
        
@@ -156,8 +157,10 @@ public class VerificarTotem extends javax.swing.JFrame {
     public void agendamentoVerificacao(Medida md) {
        
         ConexaoAzure conexaoA = new ConexaoAzure();
-        JdbcTemplate con = conexaoA.getConnection();
+        JdbcTemplate conA = conexaoA.getConnection();
         Integer fkTotem = listaTotem.get(0).getId();
+        ConexaoAzure conexaoL = new ConexaoAzure();
+        JdbcTemplate conL = conexaoA.getConnection();
         
          // Agendamento para verificação de alertas a cada 5 minuto
         ScheduledExecutorService scheduler1 = Executors.newScheduledThreadPool(1);
@@ -165,13 +168,13 @@ public class VerificarTotem extends javax.swing.JFrame {
             LocalDateTime date = LocalDateTime.now();
             try {
                 System.out.println("Agendando CPU:");
-                md.verificarAlerta(con, fkTotem, 1, md.verificarMedida(con, date, fkTotem, 1, 3));
+                md.verificarAlerta(conA, conL, fkTotem, 1, md.verificarMedida(conA, date, fkTotem, 1, 3));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             try {
                 System.out.println("Agendando RAM:");
-                md.verificarAlerta(con, fkTotem, 2, md.verificarMedida(con, date, fkTotem, 2, 3));
+                md.verificarAlerta(conA, conL, fkTotem, 2, md.verificarMedida(conA, date, fkTotem, 2, 3));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -183,7 +186,7 @@ public class VerificarTotem extends javax.swing.JFrame {
             LocalDateTime date = LocalDateTime.now();
             try {
                 System.out.println("Agendando Disco:");
-                md.verificarAlerta(con, fkTotem, 3, md.verificarMedida(con, date, fkTotem, 3, 10));
+                md.verificarAlerta(conA, conL, fkTotem, 3, md.verificarMedida(conA, date, fkTotem, 3, 10));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -195,7 +198,7 @@ public class VerificarTotem extends javax.swing.JFrame {
             LocalDateTime date = LocalDateTime.now();
             try {
                 System.out.println("Agendando Rede:");
-                md.verificarAlertaRede(con, fkTotem, 4, md.verificarMedidaRede(con, fkTotem, 4));
+                md.verificarAlertaRede(conA, conL, fkTotem, 4, md.verificarMedidaRede(conA, fkTotem, 4));
             } catch (InterruptedException ex) {
                 Logger.getLogger(VerificarTotem.class.getName()).log(Level.SEVERE, null, ex);
             }

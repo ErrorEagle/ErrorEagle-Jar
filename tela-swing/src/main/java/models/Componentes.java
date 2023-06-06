@@ -23,7 +23,7 @@ public class Componentes {
 
     }
     
-    public void validarComponentes(JdbcTemplate con) {
+    public void validarComponentes(JdbcTemplate conA, JdbcTemplate conL) {
         Looca looca = new Looca();
         Log log = new Log();
         listaComponentes = new ArrayList();
@@ -34,21 +34,25 @@ public class Componentes {
         RedeInterfaceGroup grupoDeInterfaces = looca.getRede().getGrupoDeInterfaces();
         List<RedeInterface> grupodeInterface = grupoDeInterfaces.getInterfaces();
 
-        listaComponentes = con.query("select * from Componente", new BeanPropertyRowMapper(Componentes.class));
+        listaComponentes = conA.query("select * from Componente", new BeanPropertyRowMapper(Componentes.class));
 
         if (listaComponentes.isEmpty()) {
             log.writeRecordToLogFile("Cadastrando Componentes...");
             //Cadastrar CPU
-            con.update("insert into Componente(nome) values ('CPU')");
+            conA.update("insert into Componente(nome) values ('CPU')");
+            conL.update("insert into Componente(nome) values ('CPU')");
 
             //Cadastrar RAM
-            con.update("insert into Componente(nome) values ('RAM')");
+            conA.update("insert into Componente(nome) values ('RAM')");
+            conL.update("insert into Componente(nome) values ('RAM')");
 
             //Cadastrar Disco
-            con.update("insert into Componente(nome) values ('DISCO')");
+            conA.update("insert into Componente(nome) values ('DISCO')");
+            conL.update("insert into Componente(nome) values ('DISCO')");
 
             //Cadastrar Rede
-            con.update("insert into Componente(nome) values ('REDE')");
+            conA.update("insert into Componente(nome) values ('REDE')");
+            conL.update("insert into Componente(nome) values ('REDE')");
 
             System.out.println("Coloquei dados de componentes lá na tabela componentes!");
         } else {
@@ -75,19 +79,23 @@ public class Componentes {
 
             if (hasCPU) {
                 log.writeRecordToLogFile("Inserindo Componente CPU");
-                con.update("insert into Componente(nome) values ('CPU')");
+                conA.update("insert into Componente(nome) values ('CPU')");
+                conL.update("insert into Componente(nome) values ('CPU')");
             }
             if (hasRAM) {
                 log.writeRecordToLogFile("Inserindo Componente RAM");
-                con.update("insert into Componente(nome) values ('RAM')");
+                conA.update("insert into Componente(nome) values ('RAM')");
+                conL.update("insert into Componente(nome) values ('RAM')");
             }
             if (hasDisco) {
                 log.writeRecordToLogFile("Inserindo Componente DISCO");
-                con.update("insert into Componente(nome) values ('DISCO')");
+                conA.update("insert into Componente(nome) values ('DISCO')");
+                conL.update("insert into Componente(nome) values ('DISCO')");
             }
             if (hasRede) {
                 log.writeRecordToLogFile("Inserindo Componente REDE");
-                con.update("insert into Componente(nome) values ('REDE')");
+                conA.update("insert into Componente(nome) values ('REDE')");
+                conL.update("insert into Componente(nome) values ('REDE')");
             }
 
         }
