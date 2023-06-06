@@ -32,64 +32,58 @@ read inst
                                 then
                                         echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Preparando para instalar a versão 11 do Java. Confirme a instalação quando solicitado ;D"
                                         sudo apt install default-jre ; apt install openjdk-17-jre-headless; -y
- clear
+                                        clear
                                         echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Java instalado com sucesso!"
                                 fi
                 else
-                echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7)  Você optou por não instalar o Java por enquanto, até a próxima então!"
+                echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Você optou por não instalar o Java por enquanto, até a próxima então!"
         fi
 fi
 
-echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7)Atualize os pacotes do sistema:  "
+echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Atualize os pacotes do sistema:  "
                         sleep 2
                         sudo apt update && sudo apt upgrade –y
-clear
+                        clear
 
 echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7)Instalando o docker na maquina:  "
                         sleep 2
 			sudo apt install docker.io
-clear
 
 echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7)Verificando se o Docker foi instalado corretamente:  "
                         sleep 2
-docker --version
-
-clear
+                        docker --version
 
 echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7)Ativando o docker para que ele fique disponivel para uso:  "
                         sleep 2
-sudo systemctl start docker
-clear
+                        sudo systemctl start docker
 
 echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7)Habilitando o serviço do docker:  "
                         sleep 2
-sudo systemctl enable docker
-clear
+                        sudo systemctl enable docker
 
-echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7)Baixando a image do docker:  "
+echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Baixando a image do docker:  "
                         sleep 2
-sudo docker pull mysql:8.0.32
-clear
+                        sudo docker pull mysql:8.0
 
-echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7)Confirmando o download da image:  "
+echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Confirmando o download da image:  "
                         sleep 2
-sudo docker images
-clear
+                        sudo docker images
 
-echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7)criando o container e configurando o mysql dentro do container:  "
+echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Criando o Container mysql e o banco de dados..."
                         sleep 2
-sudo docker run -d -p 3306:3306 --name ContainerSQL -e "MYSQL_DATABASE=erroreagle" -e "MYSQL_ROOT_PASSWORD=urubu100" mysql:8.0.32
-clear
+                        sudo docker run -d -p 3306:3306 --name ContainerSQL -e "MYSQL_DATABASE=erroreagle" -e "MYSQL_ROOT_PASSWORD=urubu100" mysql:8.0
+                        clear
 
-echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7)Acessando Container:  "
+echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Acessando Container e criando as tabelas: "
                         sleep 2
-sudo docker start ContainerSQL
-
-sudo docker exec -i ContainerSQL mysql -u root -p'urubu100' <<EOF
-use erroreagle;
-CREATE TABLE IF NOT EXISTS Totem (id INT primary key NOT NULL AUTO_INCREMENT,
+                        sudo docker start ContainerSQL
+                        sudo docker exec -i ContainerSQL mysql -u root -p'urubu100' <<EOF
+USE erroreagle;
+CREATE TABLE IF NOT EXISTS Totem (
+id INT NOT NULL AUTO_INCREMENT,
 hostName VARCHAR(100) NOT NULL UNIQUE,
-fkEmpresa INT NOT NULL);
+fkEmpresa INT NOT NULL,
+PRIMARY KEY (id));
 
 CREATE TABLE IF NOT EXISTS Componente (
 id INT NOT NULL AUTO_INCREMENT,
@@ -108,7 +102,6 @@ REFERENCES Totem (id),
 CONSTRAINT fk_Totem_has_TipoComponente_TipoComponente1
 FOREIGN KEY (fkComponente)
 REFERENCES Componente (id));
-
 
 CREATE TABLE IF NOT EXISTS Medida (
 id INT NOT NULL AUTO_INCREMENT,
@@ -143,11 +136,11 @@ EOF
 echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) : Sua maquina já está preparada, agora vamos baixar o aplicativo da ErrorEagle"
 
         sleep 2
-        wget https://raw.githubusercontent.com/ErrorEagle/ErrorEagle-jar/main/tela-swing/target/ErrorEagle.jar
+        wget https://raw.githubusercontent.com/ErrorEagle/ErrorEagle-jar/testes/tela-swing/target/ErrorEagle.jar
 
         echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Concluindo Instalação..."
         echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7) Deseja executar o programa da ErrorEagle (s/n)"
-    read get4
+        read get4
 
  if [ "$get4" == "s" ]; then
             echo "$(tput setaf 10)[Assistente ErrorEagle]:$(tput setaf 7)Executando aplicação"
