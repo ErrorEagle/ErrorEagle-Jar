@@ -98,7 +98,7 @@ public class VerificarTotem extends javax.swing.JFrame {
                         lblTitulo.setText("Capturando Dados!");
                         Medida md = new Medida();
                         iniciarCaptura(conA, md);
-//                        iniciarCaptura(conL, md);
+                        iniciarCaptura(conL, md);
                         agendamentoVerificacao(md);
                     }
                 };

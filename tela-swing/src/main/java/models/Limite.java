@@ -86,10 +86,7 @@ public class Limite {
                 log.writeRecordToLogFile("Cadastrando Limite da DISCO");
                 con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 3, 50.0, 0.0)");
             }
-            if (hasRede) {
-                log.writeRecordToLogFile("Cadastrando Limite da REDE");
-                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 4, 50.0, 0.0)");
-            }
+            
 
         }
         
@@ -144,10 +141,7 @@ public class Limite {
                 log.writeRecordToLogFile("Cadastrando Limite de Alerta do DISCO");
                 con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (2, 3, 75.0, 50.0)");
             }
-            if (hasRede) {
-                log.writeRecordToLogFile("Cadastrando Limite de Alerta da REDE");
-                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (2, 4, 75.0, 50.0)");
-            }
+         
 
         }
     }
@@ -203,10 +197,7 @@ public class Limite {
                 log.writeRecordToLogFile("Cadastrando Limite Urgente do DISCO");
                 con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 3, 90.0, 75.0)");
             }
-            if (hasRede) {
-                log.writeRecordToLogFile("Cadastrando Limite Urgente da REDE");
-                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (1, 4, 90.0, 75.0)");
-            }
+         
 
         }
 
@@ -262,10 +253,7 @@ public class Limite {
                 log.writeRecordToLogFile("Cadastrando Limite Critico do DISCO");
                 con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (4, 3, 100.0, 90.0)");
             }
-            if (hasRede) {
-                log.writeRecordToLogFile("Cadastrando Limite Critico da REDE");
-                con.update("insert into Limite(fkTipoAlerta, fkComponente, maximo, minimo) values (4, 4, 100.0, 90.0)");
-            }
+          
 
         }
       
