@@ -23,7 +23,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>frames.TelaLogin</mainClass> 
+                            <mainClass>frames.Login</mainClass> 
                         </manifest>
                     </archive>
                   <finalName>ErrorEagle</finalName> 
