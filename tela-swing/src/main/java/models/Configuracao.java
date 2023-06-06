@@ -58,7 +58,7 @@ public class Configuracao {
         return capacidade;
     }
 
-    public void validarConfiguracao(Integer idTotem, Double bandaLarga, JdbcTemplate conA, JdbcTemplate conL) {
+    public void validarConfiguracao(Integer idTotem, Double bandaLarga, JdbcTemplate con) {
         log.writeRecordToLogFile("Validando Configuração...");
         listaConfiguracao = new ArrayList();
 
@@ -67,17 +67,15 @@ public class Configuracao {
         DiscoGrupo grupoDeDiscos = looca.getGrupoDeDiscos();
         List<Disco> discos = grupoDeDiscos.getDiscos();
 
-        listaConfiguracao = conA.query("select * from Configuracao where fkTotem = ?", new BeanPropertyRowMapper(Configuracao.class), idTotem);
+        listaConfiguracao = con.query("select * from Configuracao where fkTotem = ?", new BeanPropertyRowMapper(Configuracao.class), idTotem);
 
         if (listaConfiguracao.isEmpty()) {
             log.writeRecordToLogFile("Associando Configuração a este Totem...");
             //Cadastrar CPU
-            conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 1, ?, 'GHz')", idTotem, bandaLarga);
-            conL.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 1, ?, 'GHz')", idTotem, bandaLarga);
+            con.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 1, ?, 'GHz')", idTotem, bandaLarga);
 
             //Cadastrar RAM
-            conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 2, ?, 'GB')", idTotem, bandaLarga);
-            conL.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 2, ?, 'GB')", idTotem, bandaLarga);
+            con.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 2, ?, 'GB')", idTotem, bandaLarga);
 
             //Cadastrar Disco
             for (Disco disco : discos) {
@@ -90,19 +88,16 @@ public class Configuracao {
                 Double tamanhoTB = Math.floor(tamanhoGB / Math.pow(2, 10));
 
                 if (tamanhoTB >= 1.0) {
-                    conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'TB')", idTotem, tamanhoTB);
-                    conL.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'TB')", idTotem, tamanhoTB);
+                    con.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'TB')", idTotem, tamanhoTB);
                 } else {
-                    conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'GB')", idTotem, tamanhoGB);
-                    conL.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'GB')", idTotem, tamanhoGB);
+                    con.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'GB')", idTotem, tamanhoGB);
                 }
             }
 
             //Cadastrar Rede
-            conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 4, ?, 'Mbps')", idTotem, bandaLarga);
-            conL.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 4, ?, 'Mbps')", idTotem, bandaLarga);
+            con.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 4, ?, 'Mbps')", idTotem, bandaLarga);
 
-            validarConfiguracao(idTotem, bandaLarga, conA, conL);
+            validarConfiguracao(idTotem, bandaLarga, con);
 
         } else {
             log.writeRecordToLogFile("Verificando se a Configuração foi salva corretamente...");
@@ -143,13 +138,11 @@ public class Configuracao {
 
             if (hasCPU) {
                 log.writeRecordToLogFile("Cadastrando Configuracao CPU");
-                conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 1, ?, 'GHz')", idTotem, config.getCapacidadeCPU());
-                conL.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 1, ?, 'GHz')", idTotem, config.getCapacidadeCPU());
+                con.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 1, ?, 'GHz')", idTotem, config.getCapacidadeCPU());
             }
             if (hasRAM) {
                 log.writeRecordToLogFile("Cadastrando Configuracao RAM");
-                conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 2, ?, 'GB')", idTotem, config.getCapacidadeRAM());
-                conL.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 2, ?, 'GB')", idTotem, config.getCapacidadeRAM());
+                con.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 2, ?, 'GB')", idTotem, config.getCapacidadeRAM());
             }
             if (hasDisco) {
                 for (Disco disco : discos) {
@@ -163,30 +156,25 @@ public class Configuracao {
 
                     if (tamanhoTB >= 1.0) {
                         log.writeRecordToLogFile("Cadastrando Configuracao DISCO com medida em TB");
-                        conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'TB')", idTotem, tamanhoTB);
-                        conL.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'TB')", idTotem, tamanhoTB);
+                        con.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'TB')", idTotem, tamanhoTB);
                     } else {
                         log.writeRecordToLogFile("Cadastrando Configuracao DISCO com medida em GB");
-                        conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'GB')", idTotem, tamanhoGB);
-                        conL.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'GB')", idTotem, tamanhoGB);
+                        con.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'GB')", idTotem, tamanhoGB);
                     }
                 }
             }
             if (hasRede) {
                 log.writeRecordToLogFile("Cadastrando Configuracao REDE");
-                conA.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 4, ?, 'Mbps')", idTotem, bandaLarga);
-                conL.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 4, ?, 'Mbps')", idTotem, bandaLarga);
+                con.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 4, ?, 'Mbps')", idTotem, bandaLarga);
             }
 
             if (updateCPU) {
                 log.writeRecordToLogFile("Atualizando Configuração da CPU");
-                conA.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 1", config.getCapacidadeCPU(), idTotem);
-                conL.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 1", config.getCapacidadeCPU(), idTotem);
+                con.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 1", config.getCapacidadeCPU(), idTotem);
             }
             if (updateRAM) {
                 log.writeRecordToLogFile("Atualizando Configuração da RAM");
-                conA.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 2", config.getCapacidadeRAM(), idTotem);
-                conL.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 2", config.getCapacidadeRAM(), idTotem);
+                con.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 2", config.getCapacidadeRAM(), idTotem);
             }
             if (updateDisco) {
                 for (Disco disco : discos) {
@@ -200,19 +188,16 @@ public class Configuracao {
 
                     if (tamanhoTB >= 1.0) {
                         log.writeRecordToLogFile("Atualizando Configuração do DISCO em TB");
-                        conA.update("update Configuracao set capacidade = ?, unidadeMedida = 'TB' where fkComponente = 3 and fkTotem = ? ", tamanhoTB, idTotem);
-                        conL.update("update Configuracao set capacidade = ?, unidadeMedida = 'TB' where fkComponente = 3 and fkTotem = ? ", tamanhoTB, idTotem);
+                        con.update("update Configuracao set capacidade = ?, unidadeMedida = 'TB' where fkComponente = 3 and fkTotem = ? ", tamanhoTB, idTotem);
                     } else {
                         log.writeRecordToLogFile("Atualizando Configuração da DISCO em GB");
-                        conA.update("update Configuracao set capacidade = ?, unidadeMedida = 'GB' where fkComponente = 3 and fkTotem = ? ", tamanhoGB, idTotem);
-                        conL.update("update Configuracao set capacidade = ?, unidadeMedida = 'GB' where fkComponente = 3 and fkTotem = ? ", tamanhoGB, idTotem);
+                        con.update("update Configuracao set capacidade = ?, unidadeMedida = 'GB' where fkComponente = 3 and fkTotem = ? ", tamanhoGB, idTotem);
                     }
                 }
             }
             if (updateRede) {
                 log.writeRecordToLogFile("Atualizando Configuração da REDE");
-                conA.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 4", bandaLarga, idTotem);
-                conL.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 4", bandaLarga, idTotem);
+                con.update("update Configuracao set capacidade = ? where fkTotem = ? and fkComponente = 4", bandaLarga, idTotem);
             }
 
         }

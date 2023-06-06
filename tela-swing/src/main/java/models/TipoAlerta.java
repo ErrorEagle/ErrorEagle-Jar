@@ -26,22 +26,21 @@ public class TipoAlerta {
     }    
     
     
-    public void validarTiposAlertas(JdbcTemplate conA, JdbcTemplate conL){
+    public void validarTiposAlertas(JdbcTemplate con){
 
         Log log = new Log();
 
         listaAlertas = new ArrayList();
         log.writeRecordToLogFile("Verificando se já tem Tipos de Alerta...");
-        listaAlertas = conA.query("select * from TipoAlerta",
+        listaAlertas = con.query("select * from TipoAlerta",
                 new BeanPropertyRowMapper(TipoAlerta.class));
 
         if (listaAlertas.isEmpty()) {
             System.out.println("Vou cadastrar tipos de alertas na Azure");
             log.writeRecordToLogFile("Cadastrando Tipos de Alerta na Azure...");
-            conA.update("insert into TipoAlerta(Criticidade) values ('Ideal'), ('Atenção'), ('Urgente'), ('Crítico')");
-            conL.update("insert into TipoAlerta(Criticidade) values ('Ideal'), ('Atenção'), ('Urgente'), ('Crítico')");
+            con.update("insert into TipoAlerta(Criticidade) values ('Ideal'), ('Atenção'), ('Urgente'), ('Crítico')");
             
-            validarTiposAlertas(conA, conL);
+            validarTiposAlertas(con);
 
         } else {
             log.writeRecordToLogFile("Verificando se Tipos de Alertas foram cadastrados...");
@@ -62,23 +61,19 @@ public class TipoAlerta {
             
             if (hasIdeal) {
                 log.writeRecordToLogFile("Cadastrando Tipo de Alerta Ideal");
-                conA.update("insert into TipoAlerta(Criticidade) values ('Ideal')");
-                conL.update("insert into TipoAlerta(Criticidade) values ('Ideal')");
+                con.update("insert into TipoAlerta(Criticidade) values ('Ideal')");
             }
             if (hasAtencao) {
                 log.writeRecordToLogFile("Cadastrando Tipo de Alerta Atenção");
-                conA.update("insert into TipoAlerta(Criticidade) values ('Atenção')");
-                conL.update("insert into TipoAlerta(Criticidade) values ('Atenção')");
+                con.update("insert into TipoAlerta(Criticidade) values ('Atenção')");
             }
             if (hasUrgente) {
                 log.writeRecordToLogFile("Cadastrando Tipo de Alerta Urgente");
-                conA.update("insert into TipoAlerta(Criticidade) values ('Urgente')");
-                conL.update("insert into TipoAlerta(Criticidade) values ('Urgente')");
+                con.update("insert into TipoAlerta(Criticidade) values ('Urgente')");
             }
             if (hasCritico) {
                 log.writeRecordToLogFile("Cadastrando Tipo de Alerta Critico");
-                conA.update("insert into TipoAlerta(Criticidade) values ('Crítico')");
-                conL.update("insert into TipoAlerta(Criticidade) values ('Crítico')");
+                con.update("insert into TipoAlerta(Criticidade) values ('Crítico')");
             }
             
         }

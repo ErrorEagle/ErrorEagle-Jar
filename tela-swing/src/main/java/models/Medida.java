@@ -38,7 +38,7 @@ public class Medida {
     public Medida() {
     }
 
-    public void inserirMedidas(Integer id, Double bandaLarga, JdbcTemplate conA, JdbcTemplate conL) {
+    public void inserirMedidas(Integer id, Double bandaLarga, JdbcTemplate con) {
 
         LocalDateTime dataHora = LocalDateTime.now();
 
@@ -72,65 +72,41 @@ public class Medida {
         }
 
         log.writeRecordToLogFile("Inserindos Medida da CPU");
-        conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,1)",
+        con.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,1)",
                 usoCPU,
                 dataHora,
                 id
         );
-        conL.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,1)",
-                usoCPU,
-                dataHora,
-                id
-        );
-
         log.writeRecordToLogFile("Inserindos Medida da RAM");
-        conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,2)",
-                porcentagemUsoRam,
-                dataHora,
-                id
-        );
-        log.writeRecordToLogFile("Inserindos Medida da RAM");
-        conL.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,2)",
+        con.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,2)",
                 porcentagemUsoRam,
                 dataHora,
                 id
         );
 
         log.writeRecordToLogFile("Inserindos Medida do DISCO");
-        conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,3)",
-                porcentagemDisponivel,
-                dataHora,
-                id
-        );
-        log.writeRecordToLogFile("Inserindos Medida do DISCO");
-        conL.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,3)",
+        con.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,3)",
                 porcentagemDisponivel,
                 dataHora,
                 id
         );
 
         log.writeRecordToLogFile("Inserindos Medida do REDE");
-        conA.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,4)",
+        con.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,4)",
                 latencia,
                 dataHora,
                 id);
-        log.writeRecordToLogFile("Inserindos Medida do REDE");
-        conL.update("INSERT INTO Medida (percentual, dataHora, fkTotem, fkComponente) VALUES (?,?,?,4)",
-                latencia,
-                dataHora,
-                id);
+
     }
 
-    public void salvarAlerta(JdbcTemplate conA, JdbcTemplate conL, Integer id, Integer componente, Double media, String mensagem) {
+    public void salvarAlerta(JdbcTemplate con, Integer id ,Integer componente, Double media, String mensagem) {
         SituacaoTotem st = new SituacaoTotem(mensagem, media, id, componente);
         System.out.println(st.toString());
         System.out.println("Select 3 salvando alerta");
-
+        
         try {
             System.out.println("Salvando Alerta " + st.getMensagem() + " " + st.getFkComponente());
-            conA.update("INSERT INTO situacaoTotem (mensagem, media, dataHora, fkTotem, fkComponente) VALUES (?, ?, ?, ?, ?)",
-                    st.getMensagem(), st.getMedia(), st.getDatahora(), st.getFkTotem(), st.getFkComponente());
-            conL.update("INSERT INTO situacaoTotem (mensagem, media, dataHora, fkTotem, fkComponente) VALUES (?, ?, ?, ?, ?)",
+            con.update("INSERT INTO situacaoTotem (mensagem, media, dataHora, fkTotem, fkComponente) VALUES (?, ?, ?, ?, ?)",
                     st.getMensagem(), st.getMedia(), st.getDatahora(), st.getFkTotem(), st.getFkComponente());
         } catch (DataAccessException e) {
             System.out.println("Erro durante a inserção: " + e.getMessage());
@@ -138,15 +114,15 @@ public class Medida {
         }
     }
 
-    public void verificarAlerta(JdbcTemplate conA, JdbcTemplate conL, Integer id, Integer componente, Double media) throws IOException {
-
+    public void verificarAlerta(JdbcTemplate con, Integer id ,Integer componente, Double media) throws IOException {
+     
         String tipoComponente = "";
         String simbolo = "";
         System.out.println("Select 2");
         String SELECT_QUERY = "SELECT l.fkComponente, l.maximo, l.minimo, ta.Criticidade FROM Limite l JOIN TipoAlerta ta ON l.fkTipoAlerta = ta.id WHERE l.fkComponente = ?;";
-
-        List<Limite> limites = conA.query(SELECT_QUERY, new BeanPropertyRowMapper<>(Limite.class), componente);
-
+       
+         List<Limite> limites = con.query(SELECT_QUERY, new BeanPropertyRowMapper<>(Limite.class), componente);
+        
         switch (componente) {
             case 1:
                 tipoComponente = "CPU";
@@ -174,11 +150,11 @@ public class Medida {
                         break;
                 }
 
-                salvarAlerta(conA, conL, id, componente, media, limite.getCriticidade());
-
+                salvarAlerta(con, id ,componente, media, limite.getCriticidade());
+                
                 Looca looca = new Looca();
                 String hostNameAtual = looca.getRede().getParametros().getHostName();
-
+                
                 SendAlert.sendMessage(String.format(
                         " Maquina: %s      Componente: %s     Criticidade: %s %s      Percentual: %.2f %%",
                         hostNameAtual, tipoComponente, limite.getCriticidade(), simbolo, media));
@@ -190,8 +166,8 @@ public class Medida {
         }
     }
 
-    public void verificarAlertaRede(JdbcTemplate conA, JdbcTemplate conL, Integer id, Integer componente, Boolean aBoolean) {
-
+    public void verificarAlertaRede(JdbcTemplate con, Integer id ,Integer componente, Boolean aBoolean) {
+        
         try {
             System.out.println("verificarAlertaRede");
             Double med = 0.0;
@@ -200,14 +176,14 @@ public class Medida {
             }
             SendAlert.sendMessage(String.format(
                     " Maquina: %s      Componente: %s     Criticidade: %s ",
-                    "Rede", aBoolean ? "Conexão com a internet" : "Sem conexão com a internet"));
-            salvarAlerta(conA, conL, id, 4, med, aBoolean ? "Conexão com a internet ok" : "Sem conexão com a internet");
+                     "Rede", aBoolean ? "Conexão com a internet" : "Sem conexão com a internet"));
+            salvarAlerta(con, id ,4, med, aBoolean ? "Conexão com a internet ok" : "Sem conexão com a internet");
         } catch (IOException ex) {
             Logger.getLogger(Totem.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public Double verificarMedida(JdbcTemplate con, LocalDateTime data, Integer id, Integer componente, Integer minutos) {
+    public Double verificarMedida(JdbcTemplate con, LocalDateTime data,Integer id ,Integer componente, Integer minutos) {
 //    System.out.println("Verificando medidas");
         List<MedidaRetorno> medidas = null;
         LocalDateTime dataHoraAtual = data;
@@ -232,7 +208,7 @@ public class Medida {
 
     }
 
-    public Boolean verificarMedidaRede(JdbcTemplate con, Integer id, Integer componente) throws InterruptedException {
+    public Boolean verificarMedidaRede(JdbcTemplate con, Integer id ,Integer componente) throws InterruptedException {
         List<Tempo> tempo = con.query(
                 "SELECT TOP 1 m.dataHora FROM Medida m WHERE m.fkComponente = ? AND m.fkTotem = ? ORDER BY m.dataHora DESC",
                 new BeanPropertyRowMapper<>(Tempo.class), componente, id);
