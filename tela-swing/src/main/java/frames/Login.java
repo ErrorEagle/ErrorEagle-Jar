@@ -68,6 +68,8 @@ public class Login extends javax.swing.JFrame {
         txtLogin = new javax.swing.JLabel();
         txtSenha = new javax.swing.JLabel();
         tittleEagle1 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ErrorEagle - Login");
@@ -150,6 +152,12 @@ public class Login extends javax.swing.JFrame {
         tittleEagle1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tittleEagle1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jPanel1.add(tittleEagle1, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 100, 50, -1));
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ErrorEagle.png"))); // NOI18N
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(-170, 0, 530, 370));
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/close.png"))); // NOI18N
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 10, -1, 40));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 610, 340));
 
@@ -298,6 +306,8 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JButton btnLogin;
     private javax.swing.JPasswordField iptSenha;
     private javax.swing.JTextField iptUsuario;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel tittleEagle;
     private javax.swing.JLabel tittleEagle1;

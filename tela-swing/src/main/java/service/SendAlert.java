@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class SendAlert {
 
-  private static String webhookUrl = "https://hooks.slack.com/services/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";
+  private static String webhookUrl = "https://hooks.slack.com/services/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";
   private static String slackChannel = "alertas";
 
   public static void sendMessage(String message) throws IOException {
