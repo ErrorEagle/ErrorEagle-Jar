@@ -14,13 +14,13 @@ import com.github.britooo.looca.api.core.Looca;
 public class Log {
 
 	private Looca looca = new Looca();
-	private String LOG_FILE_PATH = "/home/ubuntu/Desktop/logs/log.txt";
+	private String LOG_FILE_PATH = "C:/logs/log.txt";
 	private Boolean primeiraLinha = false;
 	private final int INSERT_LINE = 6;
 	private String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 
 	public String buildLogEntry(String name) {
-            File pasta = new File("/home/ubuntu/Desktop/logs/");
+            File pasta = new File("C:/logs/");
             
             if (!pasta.exists()) {
                 pasta.mkdir();
@@ -35,18 +35,26 @@ public class Log {
 	public void writeLogEntry(String logEntry, String oldContent) {
 		File logFile = new File(LOG_FILE_PATH);
 
-		if (logFile.length() > 40000 && LOG_FILE_PATH.equals("/home/ubuntu/Desktop/logs/log.txt")) {
-			LOG_FILE_PATH = "/home/ubuntu/Desktop/logs/log2.txt";
-		} else if (logFile.length() > 4000 && LOG_FILE_PATH.equals("/home/ubuntu/Desktop/logs/log2.txt")) {
-			LOG_FILE_PATH = "/home/ubuntu/Desktop/logs/log.txt";
+		if (logFile.length() > 40000 && LOG_FILE_PATH.equals("C:/logs/log.txt")) {
+			LOG_FILE_PATH = "C:/logs/log2.txt";
+			primeiraLinha = true;
+		} else if (logFile.length() > 4000 && LOG_FILE_PATH.equals("C:/logs/log2.txt")) {
+			LOG_FILE_PATH = "C:/logs/log.txt";
+			primeiraLinha = true;
 		}
 
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(LOG_FILE_PATH, false))) {
 			
-			if (LOG_FILE_PATH.length() == 0) {
+			if (LOG_FILE_PATH.equals("C:/logs/log.txt") && primeiraLinha) {
 				writer.write(logEntry);
 				writer.newLine();
 				writer.newLine();
+				primeiraLinha = false;
+			} else if (LOG_FILE_PATH.equals("C:/logs/log2.txt") && new File(LOG_FILE_PATH).length() == 0) {
+				writer.write(logEntry);
+				writer.newLine();
+				writer.newLine();
+				primeiraLinha = false;
 			} else {
 				writer.write(logEntry);
 				writer.newLine();
