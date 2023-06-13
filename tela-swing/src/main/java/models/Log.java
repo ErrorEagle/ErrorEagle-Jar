@@ -10,9 +10,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.github.britooo.looca.api.core.Looca;
+import com.github.britooo.looca.api.group.sistema.Sistema;
 
 public class Log {
-
+    
+        // /home/ubuntu/Desktop/logs/log.txt
+        // C:/logs/log.txt
 	private Looca looca = new Looca();
 	private String LOG_FILE_PATH = "/home/ubuntu/Desktop/logs/log.txt";
 	private Boolean primeiraLinha = false;
@@ -20,7 +23,7 @@ public class Log {
 	private String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 
 	public String buildLogEntry(String name) {
-            File pasta = new File("/home/ubuntu/Desktop/logs");
+            File pasta = new File("/home/ubuntu/Desktop/logs/");
             
             if (!pasta.exists()) {
                 pasta.mkdir();
@@ -38,7 +41,7 @@ public class Log {
 		if (logFile.length() > 40000 && LOG_FILE_PATH.equals("/home/ubuntu/Desktop/logs/log.txt")) {
 			LOG_FILE_PATH = "/home/ubuntu/Desktop//logs/log2.txt";
 			primeiraLinha = true;
-		} else if (logFile.length() > 4000 && LOG_FILE_PATH.equals("/home/ubuntu/Desktop//logs/log2.txt")) {
+		} else if (logFile.length() > 0000 && LOG_FILE_PATH.equals("/home/ubuntu/Desktop/logs/log2.txt")) {
 			LOG_FILE_PATH = "/home/ubuntu/Desktop/logs/log.txt";
 			primeiraLinha = true;
 		}
@@ -50,7 +53,7 @@ public class Log {
 				writer.newLine();
 				writer.newLine();
 				primeiraLinha = false;
-			} else if (LOG_FILE_PATH.equals("/home/ubuntu/Desktop/logs/log2.txt") && new File(LOG_FILE_PATH).length() == 0) {
+			} else if (LOG_FILE_PATH.equals("/home/ubuntu/Desktop/logs/log.txt") && new File(LOG_FILE_PATH).length() == 0) {
 				writer.write(logEntry);
 				writer.newLine();
 				writer.newLine();

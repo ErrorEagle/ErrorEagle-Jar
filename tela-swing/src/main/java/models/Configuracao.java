@@ -89,8 +89,10 @@ public class Configuracao {
 
                 if (tamanhoTB >= 1.0) {
                     con.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'TB')", idTotem, tamanhoTB);
+                    break;
                 } else {
                     con.update("insert into Configuracao(fkTotem, fkComponente, capacidade, unidadeMedida) values (?, 3, ?, 'GB')", idTotem, tamanhoGB);
+                    break;
                 }
             }
 

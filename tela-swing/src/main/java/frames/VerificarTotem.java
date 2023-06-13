@@ -67,18 +67,23 @@ public class VerificarTotem extends javax.swing.JFrame {
                     @Override
                     protected Void doInBackground() throws Exception {
                         validarMaquinaRegistrada(conA);
+                        validarMaquinaRegistrada(conL);
                         publish("Verificando Máquina!");
 
                         cp.validarComponentes(conA);
+                        cp.validarComponentes(conL);
                         publish("Verificando Componentes!");
-
+                        
+                        cf.validarConfiguracao(listaTotem.get(0).getId(), bandaLarga, conL);
                         cf.validarConfiguracao(listaTotem.get(0).getId(), bandaLarga, conA);
                         publish("Verificando Configuração!");
 
                         tp.validarTiposAlertas(conA);
+                        tp.validarTiposAlertas(conL);
                         publish("Validando alertas!");
 
                         lm.validarLimites(conA);
+                        lm.validarLimites(conL);
                         publish("Verificando Limites!");
 
                         return null;
